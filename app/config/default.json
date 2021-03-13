@@ -1,13 +1,13 @@
 {
   "frontend": {
-    "apiPath": "api/v1",
+    "apiPath": "api",
     "basePath" : "/app",
     "keycloak": {
       "serverUrl": "https://dev.oidc.gov.bc.ca/auth"
     }
   },
   "server": {
-    "apiPath": "/api/v1",
+    "apiPath": "/api",
     "basePath" : "/app",
     "bodyLimit": "30mb",
     "keycloak": {
@@ -26,6 +26,14 @@
         "endpoint": "https://cdogs-dev.pathfinder.gov.bc.ca/api"
       },
       "tokenEndpoint": "https://dev.oidc.gov.bc.ca/auth/realms/jbd6rnxw/protocol/openid-connect/token"
+    }
+  },
+  "services": {
+    "ches": {
+      "clientId": "MSSC_SERVICE_CLIENT",
+      "clientSecret": "dd5637a2-1698-4e13-8112-7431a03a2f4b",
+      "tokenUrl": "https://dev.oidc.gov.bc.ca/auth/realms/jbd6rnxw/protocol/openid-connect/token",
+      "apiUrl": "https://ches-dev.pathfinder.gov.bc.ca/api/v1"
     }
   }
 }

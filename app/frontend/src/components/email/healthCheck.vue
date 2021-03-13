@@ -1,8 +1,8 @@
 <template>
   <v-container class="text-center">
-    <v-btn @click="getHello" color="primary" large :loading="loading">
-      <v-icon left>mdi-hexagon-multiple</v-icon>
-      <span>Get Response</span>
+    <v-btn @click="healthCheck" color="primary" large :loading="loading">
+      <v-icon left>mdi-plus</v-icon>
+      <span>health check</span>
     </v-btn>
 
     <BaseDialog :show="showDialog" @close-dialog="showDialog = false">
@@ -11,33 +11,34 @@
         <v-icon v-else large color="error">warning</v-icon>
       </template>
       <template v-slot:text>
-        <p>{{ helloData }}</p>
+        <p>{{ healthData }}</p>
       </template>
     </BaseDialog>
+
   </v-container>
 </template>
 
 <script>
-import helloService from '@/services/helloService';
+import chesService from '@/services/chesService';
 
 export default {
-  name: 'HelloWorld',
+  name: 'healthCheck',
   data: () => ({
     error: false,
-    helloData: '',
+    healthData: '',
     loading: false,
     showDialog: false
   }),
   methods: {
-    async getHello() {
+    async healthCheck() {
       this.error = false;
       this.loading = true;
       try {
-        const response = await helloService.getHello();
-        this.helloData = response.data;
+        const response = await chesService.healthCheck();
+        this.healthData = response.data;
       } catch (e) {
         this.error = true;
-        this.helloData = e;
+        this.healthData = e;
       }
       this.loading = false;
       this.showDialog = true;

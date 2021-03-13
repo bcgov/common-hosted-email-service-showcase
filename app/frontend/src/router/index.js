@@ -29,9 +29,9 @@ export default function getRouter(basePath = '/') {
         }
       },
       {
-        path: '/secure',
-        name: 'Secure',
-        component: () => import(/* webpackChunkName: "secure" */ '@/views/Secure.vue'),
+        path: '/email',
+        name: 'Email',
+        component: () => import(/* webpackChunkName: "email" */ '@/views/Email.vue'),
         meta: {
           hasLogin: true,
           requiresAuth: true

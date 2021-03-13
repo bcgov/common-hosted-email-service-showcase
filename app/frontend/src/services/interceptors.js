@@ -11,7 +11,8 @@ export function appAxios(timeout = 10000) {
   const axiosOptions = { timeout: timeout };
   if (Vue.prototype.$config) {
     const config = Vue.prototype.$config;
-    axiosOptions.baseURL = `${config.basePath}/${config.apiPath}`;
+    // do we have to use /app/api/v1 as the base path??
+    axiosOptions.baseURL = `${config.basePath}/api`;
   }
 
   const instance = axios.create(axiosOptions);

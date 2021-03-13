@@ -3,11 +3,11 @@ import { ApiRoutes } from '@/utils/constants';
 
 export default {
   /**
-   * @function getHello
-   * Fetch the contents of the hello endpoint
+   * @function heyHealth
+   * Fetch the contents of the ches /health endpoint
    * @returns {Promise} An axios response
    */
-  getHello() {
-    return appAxios().get(ApiRoutes.HELLO);
+  healthCheck() {
+    return appAxios().get(ApiRoutes.CHES_HEALTH);
   }
 };

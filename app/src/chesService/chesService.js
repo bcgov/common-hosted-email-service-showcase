@@ -2,8 +2,8 @@ const config = require('config');
 const log = require('npmlog');
 
 const ClientConnection = require('./clientConnection');
-const errorToProblem = require('./errorToProblem');
 
+const errorToProblem = require('./errorToProblem');
 const SERVICE = 'CHES';
 
 class ChesService {
@@ -16,20 +16,19 @@ class ChesService {
     this.connection = new ClientConnection({ tokenUrl, clientId, clientSecret });
     this.axios = this.connection.axios;
     this.apiUrl = apiUrl;
-    this.apiV1 = `${this.apiUrl}/v1`;
   }
 
   async health() {
     try {
-      const response = await this.axios.get(
-        `${this.apiV1}/health`,
+      const { data, status }  = await this.axios.get(
+        `${this.apiUrl}/health`,
         {
           headers: {
             'Content-Type': 'application/json'
           }
         }
       );
-      return response.data;
+      return { data, status };
     } catch (e) {
       errorToProblem(SERVICE, e);
     }
@@ -38,7 +37,7 @@ class ChesService {
   async statusQuery(params) {
     try {
       const response = await this.axios.get(
-        `${this.apiV1}/status`,
+        `${this.apiUrl}/status`,
         {
           params: params,
           headers: {
@@ -55,7 +54,7 @@ class ChesService {
   async cancelMsg(msgId) {
     try {
       const response = await this.axios.delete(
-        `${this.apiV1}/cancel/${msgId}`,
+        `${this.apiUrl}/cancel/${msgId}`,
         {
           headers: {
             'Content-Type': 'application/json'
@@ -71,7 +70,7 @@ class ChesService {
   async cancelQuery(params) {
     try {
       const response = await this.axios.delete(
-        `${this.apiV1}/cancel`,
+        `${this.apiUrl}/cancel`,
         {
           params: params,
           headers: {
@@ -88,7 +87,7 @@ class ChesService {
   async send(email) {
     try {
       const response = await this.axios.post(
-        `${this.apiV1}/email`,
+        `${this.apiUrl}/email`,
         email,
         {
           headers: {
@@ -108,7 +107,7 @@ class ChesService {
   async merge(data) {
     try {
       const response = await this.axios.post(
-        `${this.apiV1}/emailMerge`,
+        `${this.apiUrl}/emailMerge`,
         data,
         {
           headers: {
@@ -127,7 +126,7 @@ class ChesService {
   async preview(data) {
     try {
       const response = await this.axios.post(
-        `${this.apiV1}/emailMerge/preview`,
+        `${this.apiUrl}/emailMerge/preview`,
         data,
         {
           headers: {
@@ -145,10 +144,11 @@ class ChesService {
 
 }
 
-const endpoint = config.get('serviceClient.commonServices.ches.endpoint');
-const tokenEndpoint = config.get('serviceClient.commonServices.tokenEndpoint');
-const username = config.get('serviceClient.commonServices.username');
-const password = config.get('serviceClient.commonServices.password');
+// const endpoint = config.get('serviceClient.commonServices.ches.endpoint');
+// const tokenEndpoint = config.get('serviceClient.commonServices.tokenEndpoint');
+// const username = config.get('serviceClient.commonServices.username');
+// const password = config.get('serviceClient.commonServices.password');
 
-let chesService = new ChesService({tokenUrl: tokenEndpoint, clientId: username, clientSecret: password, apiUrl: endpoint});
-module.exports = chesService;
+// let chesService = new ChesService({tokenUrl: tokenEndpoint, clientId: username, clientSecret: password, apiUrl: endpoint});
+
+module.exports = ChesService;
