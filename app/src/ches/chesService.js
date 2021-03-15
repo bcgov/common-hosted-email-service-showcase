@@ -7,6 +7,7 @@ const errorToProblem = require('./errorToProblem');
 const SERVICE = 'CHES';
 
 class ChesService {
+
   constructor({tokenUrl, clientId, clientSecret, apiUrl}) {
     log.verbose('ChesService', `Constructed with ${tokenUrl}, ${clientId}, clientSecret, ${apiUrl}`);
     if (!tokenUrl || !clientId || !clientSecret || !apiUrl) {
@@ -15,11 +16,14 @@ class ChesService {
     }
     this.connection = new ClientConnection({ tokenUrl, clientId, clientSecret });
     this.axios = this.connection.axios;
-    this.apiUrl = apiUrl;
+    this.apiUrl = `${apiUrl}/v1`;
   }
 
   async health() {
     try {
+
+      console.log('2', `${this.apiUrl}/health`);
+
       const { data, status }  = await this.axios.get(
         `${this.apiUrl}/health`,
         {
@@ -144,11 +148,10 @@ class ChesService {
 
 }
 
-// const endpoint = config.get('serviceClient.commonServices.ches.endpoint');
-// const tokenEndpoint = config.get('serviceClient.commonServices.tokenEndpoint');
-// const username = config.get('serviceClient.commonServices.username');
-// const password = config.get('serviceClient.commonServices.password');
+const endpoint = config.get('serviceClient.commonServices.ches.endpoint');
+const tokenEndpoint = config.get('serviceClient.commonServices.tokenEndpoint');
+const username = config.get('serviceClient.commonServices.username');
+const password = config.get('serviceClient.commonServices.password');
 
-// let chesService = new ChesService({tokenUrl: tokenEndpoint, clientId: username, clientSecret: password, apiUrl: endpoint});
-
-module.exports = ChesService;
+let chesService = new ChesService({tokenUrl: tokenEndpoint, clientId: username, clientSecret: password, apiUrl: endpoint});
+module.exports = chesService;

@@ -7,8 +7,8 @@ const path = require('path');
 const Problem = require('api-problem');
 const querystring = require('querystring');
 
-const apiRoutes = require('./src/chesService/routes');
 const keycloak = require('./src/components/keycloak');
+const v1Router = require('./src/routes/v1');
 
 const apiRouter = express.Router();
 const state = {
@@ -53,7 +53,7 @@ apiRouter.get('/api', (_req, res) => {
 });
 
 // Host API endpoints
-apiRouter.use(config.get('server.apiPath'), apiRoutes);
+apiRouter.use(config.get('server.apiPath'), v1Router);
 app.use(config.get('server.basePath'), apiRouter);
 
 // Host the static frontend assets

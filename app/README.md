@@ -1,10 +1,10 @@
-# Vue Scaffold Application
+# CHES Showcase Application
 
-This node.js scaffold app hosts the Vue scaffold frontend. It implements a minimal endpoint to allow for Keycloak authentication.
+This node.js CHES Showcase app hosts the CHES Showcase frontend. It implements a minimal endpoint to allow for Keycloak authentication.
 
 ## Configuration
 
-The Vue scaffold app will require some configuration. The API will be locked down and require a valid JWT Token to access. We will need to configure the application to authenticate using the same Keycloak realm as the [frontend](frontend). Note that the Vue scaffold frontend is currently designed to expect all associated resources to be relative to the original access path.
+The CHES Showcase app will require some configuration. The API will be locked down and require a valid JWT Token to access. We will need to configure the application to authenticate using the same Keycloak realm as the [frontend](frontend). Note that the CHES Showcase frontend is currently designed to expect all associated resources to be relative to the original access path.
 
 ## Super Quickstart
 

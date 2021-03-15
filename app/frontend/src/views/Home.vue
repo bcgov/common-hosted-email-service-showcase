@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <h1 class="my-6 text-center">CHES - Showcase</h1>
+    <h1 class="my-6 text-center">Welcome</h1>
   </v-container>
 </template>
 
