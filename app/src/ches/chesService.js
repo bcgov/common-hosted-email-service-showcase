@@ -8,7 +8,7 @@ const SERVICE = 'CHES';
 
 class ChesService {
 
-  constructor({tokenUrl, clientId, clientSecret, apiUrl}) {
+  constructor({ tokenUrl, clientId, clientSecret, apiUrl }) {
     log.verbose('ChesService', `Constructed with ${tokenUrl}, ${clientId}, clientSecret, ${apiUrl}`);
     if (!tokenUrl || !clientId || !clientSecret || !apiUrl) {
       log.error('ChesService', 'Invalid configuration.');
@@ -21,10 +21,7 @@ class ChesService {
 
   async health() {
     try {
-
-      console.log('2', `${this.apiUrl}/health`);
-
-      const { data, status }  = await this.axios.get(
+      const { data, status } = await this.axios.get(
         `${this.apiUrl}/health`,
         {
           headers: {
@@ -38,9 +35,9 @@ class ChesService {
     }
   }
 
-  async statusQuery(params) {
+  async getStatus(params) {
     try {
-      const response = await this.axios.get(
+      const { data, status } = await this.axios.get(
         `${this.apiUrl}/status`,
         {
           params: params,
@@ -49,31 +46,15 @@ class ChesService {
           }
         }
       );
-      return response.data;
+      return { data, status };
     } catch (e) {
       errorToProblem(SERVICE, e);
     }
   }
 
-  async cancelMsg(msgId) {
+  async cancel(params) {
     try {
-      const response = await this.axios.delete(
-        `${this.apiUrl}/cancel/${msgId}`,
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-      return response.data;
-    } catch (e) {
-      errorToProblem(SERVICE, e);
-    }
-  }
-
-  async cancelQuery(params) {
-    try {
-      const response = await this.axios.delete(
+      const { data, status } = await this.axios.delete(
         `${this.apiUrl}/cancel`,
         {
           params: params,
@@ -82,7 +63,7 @@ class ChesService {
           }
         }
       );
-      return response.data;
+      return { data, status };
     } catch (e) {
       errorToProblem(SERVICE, e);
     }
@@ -90,7 +71,7 @@ class ChesService {
 
   async send(email) {
     try {
-      const response = await this.axios.post(
+      const { data, status } = await this.axios.post(
         `${this.apiUrl}/email`,
         email,
         {
@@ -101,18 +82,17 @@ class ChesService {
           maxBodyLength: Infinity
         }
       );
-      return response.data;
+      return { data, status };
     } catch (e) {
       errorToProblem(SERVICE, e);
     }
   }
 
-
-  async merge(data) {
+  async merge(mergeData) {
     try {
-      const response = await this.axios.post(
+      const { data, status } = await this.axios.post(
         `${this.apiUrl}/emailMerge`,
-        data,
+        mergeData,
         {
           headers: {
             'Content-Type': 'application/json'
@@ -121,17 +101,17 @@ class ChesService {
           maxBodyLength: Infinity
         }
       );
-      return response.data;
+      return { data, status };
     } catch (e) {
       errorToProblem(SERVICE, e);
     }
   }
 
-  async preview(data) {
+  async mergePeview(mergeData) {
     try {
-      const response = await this.axios.post(
+      const { data, status } = await this.axios.post(
         `${this.apiUrl}/emailMerge/preview`,
-        data,
+        mergeData,
         {
           headers: {
             'Content-Type': 'application/json'
@@ -140,7 +120,7 @@ class ChesService {
           maxBodyLength: Infinity
         }
       );
-      return response.data;
+      return { data, status };
     } catch (e) {
       errorToProblem(SERVICE, e);
     }
@@ -153,5 +133,5 @@ const tokenEndpoint = config.get('serviceClient.commonServices.tokenEndpoint');
 const username = config.get('serviceClient.commonServices.username');
 const password = config.get('serviceClient.commonServices.password');
 
-let chesService = new ChesService({tokenUrl: tokenEndpoint, clientId: username, clientSecret: password, apiUrl: endpoint});
+let chesService = new ChesService({ tokenUrl: tokenEndpoint, clientId: username, clientSecret: password, apiUrl: endpoint });
 module.exports = chesService;

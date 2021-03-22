@@ -8,9 +8,9 @@ router.get('/', (req, res) => {
   res.status(200).json({
 
     // requests for website pages
-    links: relatedLinks.createLinks(req, [
-      { r: 'email', m: 'GET', p: '/email' }
-    ]),
+    // links: relatedLinks.createLinks(req, [
+    //   { r: 'email', m: 'GET', p: '/email' }
+    // ]),
 
     // child routes
     endpoints: [

@@ -29,9 +29,9 @@ export default function getRouter(basePath = '/') {
         }
       },
       {
-        path: '/email',
-        name: 'Email',
-        component: () => import(/* webpackChunkName: "email" */ '@/views/Email.vue'),
+        path: '/ches',
+        name: 'Ches',
+        component: () => import(/* webpackChunkName: "email" */ '@/views/Ches.vue'),
         meta: {
           hasLogin: true,
           requiresAuth: true

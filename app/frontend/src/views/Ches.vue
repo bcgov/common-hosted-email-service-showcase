@@ -8,10 +8,10 @@
 </template>
 
 <script>
-import healthCheck from '@/components/email/healthCheck';
+import healthCheck from '@/components/ches/healthCheck';
 
 export default {
-  name: 'Email',
+  name: 'Ches',
   components: {
     healthCheck
   }
