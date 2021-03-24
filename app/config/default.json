@@ -22,9 +22,6 @@
       "ches": {
         "endpoint": "https://ches-dev.apps.silver.devops.gov.bc.ca/api"
       },
-      "cdogs": {
-        "endpoint": "https://cdogs-dev.apps.silver.devops.gov.bc.ca/api"
-      },
       "tokenEndpoint": "https://dev.oidc.gov.bc.ca/auth/realms/jbd6rnxw/protocol/openid-connect/token",
       "username": "MSSC_SERVICE_CLIENT"
     }

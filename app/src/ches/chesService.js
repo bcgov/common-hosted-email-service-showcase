@@ -1,9 +1,9 @@
 const config = require('config');
 const log = require('npmlog');
 
-const ClientConnection = require('./clientConnection');
+const ClientConnection = require('../components/clientConnection');
 
-const errorToProblem = require('./errorToProblem');
+const errorToProblem = require('../components/errorToProblem');
 const SERVICE = 'CHES';
 
 class ChesService {
