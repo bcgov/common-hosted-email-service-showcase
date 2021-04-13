@@ -1,44 +1,45 @@
-// const helper = require('../../common/helper');
-// const controller = require('../../../src/ches/controller');
-// const chesService = require('../../../src/ches/chesService');
+const helper = require('../../common/helper');
+const chesService = require('../../../src/ches/chesService');
+
+helper.logHelper();
+
+describe('health', () => {
+
+  it('should call CHES service to get health', async () => {
+
+    chesService.health = jest.fn().mockReturnValue({ data: 'test', status: 200 });
+    const { data, status } = await chesService.health();
+
+    expect(data).toBeTruthy();
+    expect(status).toBe(200);
+    expect(chesService.health).toHaveBeenCalledTimes(1);
+  });
+
+});
 
 
-// helper.logHelper();
+describe('send', () => {
 
-// describe('health', () => {
-
-//   it('should return a string', async () => {
-
-//     chesService.health = jest.fn().mockReturnValue('sent');
-
-//     const result = await controller.healthCheck();
-
-//     console.log(result);
-//     //expect(result.status).toBe(200);
-//   });
-// });
+  // const email = {
+  //   bodyType: 'html',
+  //   body: '<h1>Welcome to Common Services</h1><p>Sent by <a href="https://bcgov.github.io/common-hosted-email-service/">CHES</a></p>',
+  //   delayTS: 0,
+  //   from: 'abc@gov.bc.ca',
+  //   subject: 'CHES Email Message',
+  //   to: ['xyz@gov.bc.ca'],
+  //   tag: 'email_123'
+  // };
 
 
-// describe('sendEmail', () => {
+  it('calls CHES service to send email', async () => {
 
-//   // const email = {
-//   //   bodyType: 'html',
-//   //   body: '<h1>Welcome to Common Services</h1><p>Sent by <a href="https://bcgov.github.io/common-hosted-email-service/">CHES</a></p>',
-//   //   delayTS: 0,
-//   //   from: 'abc@gov.bc.ca',
-//   //   subject: 'CHES Email Message',
-//   //   to: ['xyz@gov.bc.ca'],
-//   //   tag: 'email_123'
-//   // };
+    chesService.send = jest.fn().mockReturnValue({ data: 'test', status: 200 });
+    const { data, status } = await chesService.send({});
 
-//   // it('should call CHES to send an email', async () => {
+    expect(data).toBeTruthy();
+    expect(status).toBe(200);
+    expect(chesService.send).toHaveBeenCalledTimes(1);
+  });
 
-//   //   chesService.send = jest.fn().mockReturnValue('sent');
+});
 
-//   //   const result = await controller.sendEmail();
-
-//   //   expect(result).toBeTruthy();
-//   //   expect(chesService.send).toHaveBeenCalledTimes(1);
-//   // });
-
-// });

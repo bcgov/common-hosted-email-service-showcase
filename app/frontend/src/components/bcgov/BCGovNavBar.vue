@@ -3,10 +3,10 @@
     <div class="container">
       <ul>
         <li>
-          <router-link :to="{ name: 'Home' }">Home</router-link>
+          <router-link :to="{ name: 'Home' }" exact>Home</router-link>
         </li>
         <li>
-          <router-link :to="{ name: 'Ches' }">Ches</router-link>
+          <router-link :to="{ name: 'Email'}" >Email</router-link>
         </li>
       </ul>
     </div>
@@ -63,7 +63,7 @@ export default {
         }
       }
 
-      .router-link-exact-active {
+      .router-link-active {
         background-color: #7ba2cc80;
         border-bottom: 2px solid #fcba19;
         font-weight: bold;

@@ -1,8 +1,14 @@
 <template>
-  <v-container class="text-center">
-    <v-btn @click="healthCheck" color="primary" large :loading="loading">
-      <v-icon left>mdi-plus</v-icon>
-      <span>health check</span>
+  <div class="text-center">
+
+    <v-btn @click="healthCheck(true)" v-if="!error" color="success" rounded :loading="loading">
+      <v-icon left>check</v-icon>
+      <span>API health</span>
+    </v-btn>
+
+    <v-btn @click="healthCheck(true)" v-else small color="error" rounded :loading="loading">
+      <v-icon left>error</v-icon>
+      <span>API error</span>
     </v-btn>
 
     <BaseDialog :show="showDialog" @close-dialog="showDialog = false">
@@ -15,7 +21,7 @@
       </template>
     </BaseDialog>
 
-  </v-container>
+  </div>
 </template>
 
 <script>
@@ -29,8 +35,14 @@ export default {
     loading: false,
     showDialog: false
   }),
+
+  mounted: function() {
+    this.healthCheck();
+  },
+
   methods: {
-    async healthCheck() {
+
+    async healthCheck(showDialog = false) {
       this.error = false;
       this.loading = true;
       try {
@@ -41,9 +53,10 @@ export default {
         this.healthData = e;
       }
       this.loading = false;
-      this.showDialog = true;
+      this.showDialog = showDialog;
     }
   }
+
 };
 </script>
 

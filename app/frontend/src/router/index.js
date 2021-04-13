@@ -29,9 +29,22 @@ export default function getRouter(basePath = '/') {
         }
       },
       {
-        path: '/ches',
-        name: 'Ches',
-        component: () => import(/* webpackChunkName: "email" */ '@/views/Ches.vue'),
+        path: '/email',
+        name: 'Email',
+        component: () => import(/* webpackChunkName: "email" */ '@/views/Email.vue'),
+        redirect: 'email/form', // redirect to first sub-tab
+        children: [
+          {
+            path: 'form',
+            name: 'EmailForm',
+            component: () => import(/* webpackChunkName: "emailform" */ '@/views/EmailForm.vue')
+          },
+          {
+            path: 'history',
+            name: 'EmailHistory',
+            component: () => import(/* webpackChunkName: "emailhistory" */ '@/views/EmailHistory.vue')
+          }
+        ],
         meta: {
           hasLogin: true,
           requiresAuth: true
