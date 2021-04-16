@@ -32,12 +32,12 @@ export default function getRouter(basePath = '/') {
         path: '/email',
         name: 'Email',
         component: () => import(/* webpackChunkName: "email" */ '@/views/Email.vue'),
-        redirect: 'email/form', // redirect to first sub-tab
+        redirect: 'email/send', // redirect to first sub-tab
         children: [
           {
-            path: 'form',
-            name: 'EmailForm',
-            component: () => import(/* webpackChunkName: "emailform" */ '@/views/EmailForm.vue')
+            path: 'send',
+            name: 'EmailSend',
+            component: () => import(/* webpackChunkName: "emailsend" */ '@/views/EmailSend.vue')
           },
           {
             path: 'history',

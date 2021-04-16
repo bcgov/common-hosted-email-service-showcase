@@ -13,7 +13,7 @@ import chesService from '@/services/chesService';
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
-  name: 'testEmail',
+  name: 'TestEmail',
   data: () => ({
     error: false,
     emailData: '',

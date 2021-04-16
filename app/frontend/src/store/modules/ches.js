@@ -5,6 +5,7 @@ export default {
   namespaced: true,
 
   state: {
+    emailAlert: false,
     // transactions in users current session
     txs: [],
     // history table data
@@ -12,6 +13,7 @@ export default {
   },
 
   getters: {
+    emailAlert: state => state.emailAlert,
     txs: state => state.txs,
     tableData: state => state.tableData
   },
@@ -19,7 +21,19 @@ export default {
   mutations: {
     ADD_TX(state, tx) {
       state.txs.push(tx);
+    },
+
+    showAlert(state, emailAlert){
+      if(emailAlert){
+        state.emailAlert = {
+          type: emailAlert.type,
+          text: emailAlert.text
+        };
+      } else{
+        state.emailAlert = false;
+      }
     }
+
   },
 
   actions: {

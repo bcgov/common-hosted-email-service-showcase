@@ -1,14 +1,14 @@
 <template>
-  <historyTable />
+  <HistoryTable />
 </template>
 
 <script>
-import historyTable from '@/components/ches/historyTable';
+import HistoryTable from '@/components/ches/HistoryTable';
 
 export default {
   name: 'EmailHistory',
   components: {
-    historyTable
+    HistoryTable
   },
   data: () => ({
   }),

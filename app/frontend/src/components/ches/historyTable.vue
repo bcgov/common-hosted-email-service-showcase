@@ -1,11 +1,13 @@
 <template>
-  <div class="my-5">
+  <v-container class="pa-0 my-10">
     <v-text-field
       v-model="search"
       append-icon="mdi-magnify"
       label="Search"
       single-line
       hide-details
+      outlined
+      dense
       class="tbl-search mb-5"
     ></v-text-field>
     <v-data-table
@@ -14,7 +16,7 @@
       :search="search"
       class="tbl"
     ></v-data-table>
-  </div>
+  </v-container>
 </template>
 
 <script>
@@ -22,7 +24,7 @@ import { mapGetters } from 'vuex';
 import chesService from '@/services/chesService';
 
 export default {
-  name: 'historyTable',
+  name: 'HistoryTable',
   data: () => ({
     error: false,
     loading: false,
@@ -44,7 +46,7 @@ export default {
   methods: {
 
     // get status details for each message in tansactions in store
-    async populateHistoryTable() {
+    async populateTable() {
       this.error = false;
       this.loading = true;
 
@@ -68,7 +70,7 @@ export default {
   },
 
   mounted: function() {
-    this.populateHistoryTable();
+    this.populateTable();
   },
 
 };
