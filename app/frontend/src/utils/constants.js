@@ -7,3 +7,6 @@ export const ApiRoutes = Object.freeze({
 export const AppRoles = Object.freeze({
   TESTROLE: 'testrole'
 });
+
+// total attacment size limit (number of bytes (binary))
+export const ATTACHMENT_SIZE_LIMIT = 20971520;

@@ -215,9 +215,9 @@
       </v-row>
 
       <label>Attachments (optional)</label>
-      <Upload class="my-3 py-3" />
+      <Upload @filesUploaded="processAttachments($event)" class="my-3 py-3" />
 
-      <v-row justify="center">
+      <v-row justify="center" class="my-10">
         <v-col md="4">
           <v-btn width="100%" large color="primary" @click="send">
             <span>Send</span>
@@ -229,7 +229,6 @@
           </v-btn>
         </v-col>
       </v-row>
-
     </v-form>
   </v-container>
 </template>
@@ -344,7 +343,6 @@ export default {
 
           const response = await chesService.email(email);
 
-
           // show success alert
           this.alert = {
             type: 'success',
@@ -367,6 +365,29 @@ export default {
       else {
         window.scrollTo(0, 0);
       }
+    },
+
+    async processAttachments(files){
+      const attachments = await Promise.all(files.map(file => {
+        const content = this.toBase64(file);
+        return {
+          content: content,
+          contentType: file.type,
+          filename: file.name,
+          encoding: 'base64'
+        };
+      }));
+      console.log('attachments', attachments);
+      this.email.attachments = attachments;
+    },
+
+    async toBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsBinaryString(file);
+        reader.onload = () => resolve(btoa(reader.result));
+        reader.onerror = error => reject(error);
+      });
     },
 
     // download message response in in csv format
@@ -429,5 +450,4 @@ export default {
   margin-bottom: 0 !important;
   margin-left: 2rem;
 }
-
 </style>
