@@ -1,14 +1,7 @@
 const routes = require('express').Router();
-// const log = require('npmlog');
 
 const keycloak = require('../components/keycloak');
 const controller = require('./controller');
-
-// const protector = token => {
-//   const hasEmailSender = !!token.content.resource_access && token.hasApplicationRole('mssc', 'email_sender');
-//   log.verbose('protector', `Token has Application Role "email_sender" in "mssc" = ${hasEmailSender}`);
-//   return hasEmailSender;
-// };
 
 routes.get('/health', async (req, res, next) => {
   await controller.healthCheck(req, res, next);
