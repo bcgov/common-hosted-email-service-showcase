@@ -9,10 +9,10 @@ const healthCheck = async (_req, res, next) => {
   }
 };
 
-const sendEmail = async (_req, res, next) => {
+const sendEmail = async (req, res, next) => {
   let email = {};
   try {
-    email = _req.body;
+    email = req.body;
     const { data, status } = await chesService.send(email);
     res.status(status).json(data);
   } catch (error) {
@@ -20,8 +20,8 @@ const sendEmail = async (_req, res, next) => {
   }
 };
 
-const getStatus = async (_req, res, next) => {
-  let params = Object.values(_req.params).every(param => param !== undefined) ? _req.params : _req.query;
+const getStatus = async (req, res, next) => {
+  let params = Object.values(req.params).every(param => param !== undefined) ? req.params : req.query;
   try {
     const { data, status } = await chesService.getStatus(params);
     res.status(status).json(data);
@@ -30,8 +30,8 @@ const getStatus = async (_req, res, next) => {
   }
 };
 
-const cancel = async (_req, res, next) => {
-  let params = Object.values(_req.params).every(param => param !== undefined) ? _req.params : _req.query;
+const cancel = async (req, res, next) => {
+  let params = Object.values(req.params).every(param => param !== undefined) ? req.params : req.query;
   try {
     const { data, status } = await chesService.cancel(params);
     res.status(status).json(data);
@@ -40,10 +40,10 @@ const cancel = async (_req, res, next) => {
   }
 };
 
-const merge = async (_req, res, next) => {
+const merge = async (req, res, next) => {
   let mergeData = {};
   try {
-    mergeData = _req.body;
+    mergeData = req.body;
     const { data, status } = await chesService.merge(mergeData);
     res.status(status).json(data);
   } catch (error) {
@@ -51,10 +51,10 @@ const merge = async (_req, res, next) => {
   }
 };
 
-const mergePreview = async (_req, res, next) => {
+const mergePreview = async (req, res, next) => {
   let mergeData = {};
   try {
-    mergeData = _req.body;
+    mergeData = req.body;
     const { data, status } = await chesService.mergePeview(mergeData);
     res.status(status).json(data);
   } catch (error) {
@@ -62,4 +62,14 @@ const mergePreview = async (_req, res, next) => {
   }
 };
 
-module.exports = { healthCheck, sendEmail, getStatus, cancel, merge, mergePreview };
+const promote = async (req, res, next) => {
+  let params = Object.values(req.params).every(param => param !== undefined) ? req.params : req.query;
+  try {
+    const { data, status } = await chesService.promote(params);
+    res.status(status).json(data);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { healthCheck, sendEmail, getStatus, cancel, merge, mergePreview, promote };

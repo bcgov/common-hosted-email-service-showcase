@@ -30,4 +30,9 @@ routes.post('/merge/preview', keycloak.protect(), async (req, res, next) => {
   await controller.mergePreview(req, res, next);
 });
 
+// promote message with path (eg: /msgId) or query parameters (eg: ?txId=123)
+routes.post('/promote/:msgId?', keycloak.protect(), async (req, res, next) => {
+  await controller.promote(req, res, next);
+});
+
 module.exports = routes;
