@@ -187,7 +187,7 @@
       <v-row>
         <v-col cols="12" md="12" class="pb-0">
           <div class="d-flex">
-            <label class="mt-1">Body (optional)</label>
+            <label class="mt-1">Body</label>
             <v-radio-group
               v-model="email.bodyFormat"
               class="mt-0 ml-5 d-flex"
@@ -202,25 +202,34 @@
 
       <v-row>
         <v-col cols="12" md="12">
-          <!-- <label>Body (optional)</label> -->
           <v-textarea
             v-model="email.body"
             :rules="bodyRequiredRule"
+            hide-details="auto"
             outlined
             dense
             value="Enter your email body here."
+            class="mb-3"
           ></v-textarea>
         </v-col>
       </v-row>
 
-      <div class="mb-5">
-        <v-btn class="mr-5" large color="primary" @click="send">
-          <span>Send</span>
-        </v-btn>
-        <v-btn outlined large @click="cancelSend">
-          <span>Cancel</span>
-        </v-btn>
-      </div>
+      <label>Attachments (optional)</label>
+      <Upload class="my-3 py-3" />
+
+      <v-row justify="center">
+        <v-col md="4">
+          <v-btn width="100%" large color="primary" @click="send">
+            <span>Send</span>
+          </v-btn>
+        </v-col>
+        <v-col md="4">
+          <v-btn width="100%" large outlined @click="cancelSend">
+            <span>Cancel</span>
+          </v-btn>
+        </v-col>
+      </v-row>
+
     </v-form>
   </v-container>
 </template>
@@ -228,10 +237,13 @@
 <script>
 import chesService from '@/services/chesService';
 import { mapGetters, mapMutations, mapActions } from 'vuex';
+import Upload from '@/components/ches/Upload';
 
 export default {
   name: 'EmailForm',
-  components: {},
+  components: {
+    Upload
+  },
   data: () => ({
     // email fields
     email: {
@@ -250,7 +262,7 @@ export default {
     error: false,
     loading: false,
     emailFormDisabled: false,
-    emailAlert: false,
+    alert: false,
     showCcBcc: false,
     emailPriorityOptions: [
       { text: 'Normal', value: 'normal' },
@@ -258,6 +270,9 @@ export default {
       { text: 'Low', value: 'low' },
     ],
     delayMenu: false,
+
+    uploadDialog:true,
+
     sendResult: '',
     // validation
     emailFormValid: false,
@@ -329,12 +344,14 @@ export default {
 
           const response = await chesService.email(email);
 
+
           // show success alert
-          this.emailAlert = {
+          this.alert = {
             type: 'success',
-            text: '<p><strong>Your email has been successfully sent.<br />Transaction ID:</strong>' + response.txId +  '<strong>Message ID:</strong>' +  response.messages[0].msgId + '</p>',
+            text: '<p><strong>Your email has been successfully sent.<br />Transaction ID:</strong>' + response.txId +  ' <strong>Message ID:</strong>' +  response.messages[0].msgId + '</p>'
           };
-          this.showAlert(this.emailAlert);
+
+          this.showAlert(this.alert);
 
           this.sendResult = response;
 
@@ -352,6 +369,35 @@ export default {
       }
     },
 
+    // download message response in in csv format
+    // downloadMsg(response){
+    //   try {
+    //     if (response && response.data) {
+    //       const blob = new Blob([response.data], {
+    //         type: response.headers['content-type'],
+    //       });
+    //       const url = window.URL.createObjectURL(blob);
+    //       const a = document.createElement('a');
+    //       a.href = url;
+    //       a.download = 'msg';
+    //       a.style.display = 'none';
+    //       a.classList.add('hiddenDownloadTextElement');
+    //       document.body.appendChild(a);
+    //       a.click();
+    //       document.body.removeChild(a);
+    //     } else {
+    //       throw new Error('No data in response from exportSubmissions call');
+    //     }
+    //   }
+    //   catch (error){
+    //     console.log('error!');
+    //   }
+    // },
+
+    clickHandler () {
+      this.$emit('click');
+    },
+
     cancelSend() {
       console.log('cancelSend'); // eslint-disable-line no-console
     },
@@ -361,7 +407,7 @@ export default {
     this.emailSent = true;
 
     // add alert content to store to show in another component
-    this.showAlert(this.emailAlert);
+    this.showAlert(this.alert);
   },
 };
 </script>
@@ -383,4 +429,5 @@ export default {
   margin-bottom: 0 !important;
   margin-left: 2rem;
 }
+
 </style>
