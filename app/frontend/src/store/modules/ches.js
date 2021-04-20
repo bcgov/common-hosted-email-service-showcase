@@ -43,7 +43,7 @@ export default {
       try {
         commit('ADD_TX', tx);
       } catch {
-        console.log('addTx error');
+        console.log('addTx error'); // eslint-disable-line no-console
       }
     }
 

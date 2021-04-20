@@ -264,7 +264,6 @@ export default {
     // at least one email required in combobox
     emailRequiredRule: [
       (v) => {
-        console.log(v);
         if(v.length < 1){
           return 'A Recipient E-mail is required';
         }
@@ -328,8 +327,6 @@ export default {
             to: this.email.recipients,
           };
 
-          console.log(email);
-
           const response = await chesService.email(email);
 
           // show success alert
@@ -356,7 +353,7 @@ export default {
     },
 
     cancelSend() {
-      console.log('cancelSend');
+      console.log('cancelSend'); // eslint-disable-line no-console
     },
   },
 

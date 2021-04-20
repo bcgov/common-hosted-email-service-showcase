@@ -11,7 +11,7 @@ describe('Router', () => {
   it('has the expected routes', () => {
     const routeSet = new Set(routes);
     expect(routeSet).toContainEqual(expect.objectContaining({ name: 'Home' }));
-    expect(routeSet).toContainEqual(expect.objectContaining({ name: 'Secure' }));
+    expect(routeSet).toContainEqual(expect.objectContaining({ name: 'Email' }));
     expect(routeSet).toContainEqual(expect.objectContaining({ name: 'NotFound' }));
   });
 });

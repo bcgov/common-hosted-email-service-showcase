@@ -16,7 +16,7 @@ export default {
     const response = await appAxios().post(ApiRoutes.CHES_EMAIL, email)
       .catch(e => {
         if (e && e.response && e.response.status === 422) {
-          console.log('error sending Email');
+          console.log('error sending Email'); // eslint-disable-line no-console
         } else {
           throw Error('Could not send email using CHES API: ' + e.message);
         }
@@ -29,7 +29,7 @@ export default {
     const response = await appAxios().get(`${ApiRoutes.CHES_STATUS_TX}?txId=${txId}`)
       .catch(e => {
         if (e && e.response && e.response.status === 422) {
-          console.log('error getting status by transaction ID');
+          console.log('error getting status by transaction ID'); // eslint-disable-line no-console
         } else {
           throw Error('Could get message status by transaction ID using CHES API: ' + e.message);
         }
