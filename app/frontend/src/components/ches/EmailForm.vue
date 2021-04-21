@@ -3,8 +3,8 @@
     <v-form
       ref="emailForm"
       :disabled="emailFormDisabled"
-      v-model="emailFormValid"
       lazy-validation
+      :key="componentKey"
     >
       <v-row>
         <v-col cols="12" md="6" class="disabled-input-container">
@@ -187,7 +187,7 @@
       <v-row>
         <v-col cols="12" md="12" class="pb-0">
           <div class="d-flex">
-            <label class="mt-1">Body (optional)</label>
+            <label class="mt-1">Body</label>
             <v-radio-group
               v-model="email.bodyFormat"
               class="mt-0 ml-5 d-flex"
@@ -202,25 +202,33 @@
 
       <v-row>
         <v-col cols="12" md="12">
-          <!-- <label>Body (optional)</label> -->
           <v-textarea
             v-model="email.body"
             :rules="bodyRequiredRule"
+            hide-details="auto"
             outlined
             dense
             value="Enter your email body here."
+            class="mb-3"
           ></v-textarea>
         </v-col>
       </v-row>
 
-      <div class="mb-5">
-        <v-btn class="mr-5" large color="primary" @click="send">
-          <span>Send</span>
-        </v-btn>
-        <v-btn outlined large @click="cancelSend">
-          <span>Cancel</span>
-        </v-btn>
-      </div>
+      <label>Attachments (optional)</label>
+      <Upload @filesUploaded="processAttachments($event)" class="my-3 py-3" />
+
+      <v-row justify="center" class="my-10">
+        <v-col md="4">
+          <v-btn width="100%" large color="primary" @click="send()">
+            <span>Send</span>
+          </v-btn>
+        </v-col>
+        <v-col md="4">
+          <v-btn width="100%" large outlined @click="clearForm">
+            <span>Cancel</span>
+          </v-btn>
+        </v-col>
+      </v-row>
     </v-form>
   </v-container>
 </template>
@@ -228,10 +236,13 @@
 <script>
 import chesService from '@/services/chesService';
 import { mapGetters, mapMutations, mapActions } from 'vuex';
+import Upload from '@/components/ches/Upload';
 
 export default {
   name: 'EmailForm',
-  components: {},
+  components: {
+    Upload,
+  },
   data: () => ({
     // email fields
     email: {
@@ -247,10 +258,8 @@ export default {
       tag: '',
     },
     // for display helpers
-    error: false,
-    loading: false,
     emailFormDisabled: false,
-    emailAlert: false,
+    alert: false,
     showCcBcc: false,
     emailPriorityOptions: [
       { text: 'Normal', value: 'normal' },
@@ -258,19 +267,15 @@ export default {
       { text: 'Low', value: 'low' },
     ],
     delayMenu: false,
-    sendResult: '',
-    // validation
-    emailFormValid: false,
     // at least one email required in combobox
     emailRequiredRule: [
       (v) => {
-        if(v.length < 1){
+        if (v.length < 1) {
           return 'A Recipient E-mail is required';
-        }
-        else{
+        } else {
           return true;
         }
-      }
+      },
     ],
     // emails in combobox must be valid
     emailArrayRules: [
@@ -286,9 +291,7 @@ export default {
         return true;
       },
     ],
-
-    bodyRequiredRule: [v => !!v || 'Email Body is required'],
-
+    bodyRequiredRule: [(v) => !!v || 'Email Body is required'],
   }),
 
   computed: {
@@ -301,24 +304,17 @@ export default {
     ...mapMutations('ches', ['showAlert']),
 
     async send() {
-      if (this.$refs.emailForm.validate()) {
-        // form setup
-        this.error = false;
-        this.loading = true;
 
-        // if cc/bcc is hidden clear vlaues
-        if (!this.showCcBcc) {
-          this.email.cc = this.email.bcc = [];
-        }
+      if (this.$refs.emailForm.validate()) {
 
         try {
-          // call ches service
+          // create email object
           const email = {
             attachments: this.email.attachments,
-            bcc: this.email.bcc,
+            bcc: (this.showCcBcc) ? this.email.bcc : [],
             body: this.email.body,
             bodyType: this.email.bodyFormat,
-            cc: this.email.cc,
+            cc: (this.showCcBcc) ? this.email.cc : [],
             delayTS: 0,
             from: this.userName,
             priority: this.email.priority,
@@ -326,42 +322,92 @@ export default {
             tag: this.email.tag,
             to: this.email.recipients,
           };
-
+          // send email with ches service
           const response = await chesService.email(email);
 
           // show success alert
-          this.emailAlert = {
+          this.alert = {
             type: 'success',
-            text: '<p><strong>Your email has been successfully sent.<br />Transaction ID:</strong>' + response.txId +  '<strong>Message ID:</strong>' +  response.messages[0].msgId + '</p>',
+            text: '<strong>Your email has been successfully sent.<br />Transaction ID:</strong>' + response.txId +  ' <strong>Message ID:</strong>' +  response.messages[0].msgId
           };
-          this.showAlert(this.emailAlert);
-
-          this.sendResult = response;
 
           // update store
           await this.addTx(response);
+          this.clearForm();
+
         } catch (e) {
           this.error = true;
-          this.sendResult = e;
+          // show error alert
+          this.alert = {
+            type: 'error',
+            text: e
+          };
         }
-        this.loading = false;
+
+        this.showAlert(this.alert);
       }
-      // else form isnt valid
+      // else form has validation error
       else {
         window.scrollTo(0, 0);
       }
     },
 
-    cancelSend() {
-      console.log('cancelSend'); // eslint-disable-line no-console
+    async processAttachments(files) {
+      const attachments = await Promise.all(
+        files.map((file) => {
+          return this.convertFileToAttachment(file);
+        })
+      );
+      this.email.attachments = attachments;
     },
-  },
 
-  mounted: function () {
-    this.emailSent = true;
+    async convertFileToAttachment(file) {
+      const content = await this.fileToBase64(file);
+      return {
+        content: content,
+        contentType: file.type,
+        filename: file.name,
+        encoding: 'base64',
+      };
+    },
 
-    // add alert content to store to show in another component
-    this.showAlert(this.emailAlert);
+    async fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result.replace(/^.*,/, ''));
+        reader.onerror = (error) => reject(error);
+      });
+    },
+
+    // download message response in in csv format
+    // downloadMsg(response){
+    //   try {
+    //     if (response && response.data) {
+    //       const blob = new Blob([response.data], {
+    //         type: response.headers['content-type'],
+    //       });
+    //       const url = window.URL.createObjectURL(blob);
+    //       const a = document.createElement('a');
+    //       a.href = url;
+    //       a.download = 'msg';
+    //       a.style.display = 'none';
+    //       a.classList.add('hiddenDownloadTextElement');
+    //       document.body.appendChild(a);
+    //       a.click();
+    //       document.body.removeChild(a);
+    //     } else {
+    //       throw new Error('No data in response from exportSubmissions call');
+    //     }
+    //   }
+    //   catch (error){
+    //     console.log('error!');
+    //   }
+    // },
+
+
+    clearForm() {
+    },
   },
 };
 </script>

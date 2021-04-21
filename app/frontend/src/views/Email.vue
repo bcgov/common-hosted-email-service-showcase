@@ -2,8 +2,8 @@
   <v-container class="pt-10">
     <BaseSecure>
       <!-- alert / message area -->
-      <v-alert dense text v-if="emailAlert" :type="emailAlert.type" class="mb-5">
-        <span v-html="emailAlert.text" />
+      <v-alert dense text v-if="alert" :type="alert.type" class="mb-5">
+        <span v-html="alert.text" />
       </v-alert>
 
       <!-- tabs -->
@@ -24,8 +24,8 @@
 
 <script>
 import { mapGetters } from 'vuex';
-
 import HealthCheck from '@/components/ches/HealthCheck';
+
 export default {
   name: 'Email',
   components: {
@@ -34,23 +34,29 @@ export default {
   data: () => ({
     tab: 0,
     tabs: [
-      { index: 0, name: 'Send', route: '/email/send' },
+      { index: 0, name: 'Email', route: '/email/send' },
       { index: 1, name: 'History', route: '/email/history' },
     ],
   }),
 
   computed: {
-    ...mapGetters('ches', ['emailAlert']),
+    ...mapGetters('ches', ['alert']),
   },
+
+  methods: {
+  },
+
+  mounted(){
+  }
 };
 </script>
 
 <style scoped>
 .v-tabs >>> .v-tabs-bar {
-  height: 3.5rem;
+  height: 3rem;
 }
 .v-tabs >>> .v-slide-group__content {
-  border-bottom: 1px solid #272626;
+  border-bottom: 1px solid #606060;
 }
 .v-tabs >>> .v-tabs-slider-wrapper {
   display: none;
@@ -64,7 +70,7 @@ export default {
 }
 .v-tabs >>> a.v-tab--active {
   color: #272626 !important;
-  border: 1px solid #272626;
+  border: 1px solid #606060;
   background-color: #fff;
   font-weight: bold;
   margin-bottom: -1px;
