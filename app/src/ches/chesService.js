@@ -126,6 +126,23 @@ class ChesService {
     }
   }
 
+  async promote(params) {
+    try {
+      const { data, status } = await this.axios.post(
+        `${this.apiUrl}/promote`,
+        {
+          params: params,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      return { data, status };
+    } catch (e) {
+      errorToProblem(SERVICE, e);
+    }
+  }
+
 }
 
 const endpoint = config.get('serviceClient.commonServices.ches.endpoint');
