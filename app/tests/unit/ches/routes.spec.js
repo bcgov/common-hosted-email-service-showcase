@@ -1,17 +1,17 @@
 const request = require('supertest');
-const helper = require('../../../common/helper');
+const helper = require('../../common/helper');
 
 
 // mock middleware
-const keycloak = require('../../../../src/components/keycloak');
+const keycloak = require('../../../src/components/keycloak');
 keycloak.protect = jest.fn(() => {
-  return jest.fn((req, res, next) => {
+  return jest.fn((_req, _res, next) => {
     next();
   });
 });
 
-const router = require('../../../../src/ches/routes');
-const chesService = require('../../../../src/ches/chesService');
+const router = require('../../../src/ches/routes');
+const chesService = require('../../../src/ches/chesService');
 
 // Simple Express Server
 const basePath = '/ches';
