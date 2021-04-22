@@ -40,14 +40,8 @@ export default {
   }),
 
   computed: {
-    ...mapGetters('ches', ['alert']),
+    ...mapGetters('alert', ['alert']),
   },
-
-  methods: {
-  },
-
-  mounted(){
-  }
 };
 </script>
 

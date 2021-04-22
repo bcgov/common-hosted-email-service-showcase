@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 import chesService from '@/services/chesService';
 
 export default {
@@ -40,27 +40,27 @@ export default {
   }),
 
   computed: {
-    ...mapGetters('ches', ['txs', 'tableData']),
+    ...mapGetters('ches', ['txIds', 'tableData']),
   },
 
   methods: {
+    ...mapActions('ches', ['addTableData']),
 
     // get status details for each message in tansactions in store
-    async populateTable() {
+    populateTable() {
       this.error = false;
       this.loading = true;
 
       try {
-
         // for each email transaction in store, get full status of messages
-        for (let tx of this.txs) {
+        this.txIds.forEach(async tx => {
           // if transaction isnt already in 'this.tableData' (vuex tableData property)
-          if((this.tableData.find(o => o.txId === tx.txId)) === undefined){
-            // get status details from CJES and add to tableData
+          if(!(this.tableData.find(o => o.txId === tx.txId))) {
+            // get status details from CHES and add to tableData
             const response = await chesService.getStatusByTransactionId(tx.txId);
-            this.tableData.push(...response);
+            this.addTableData(...response);
           }
-        }
+        });
       } catch (e) {
         this.error = true;
         this.tableData = e;
@@ -69,10 +69,9 @@ export default {
     },
   },
 
-  mounted: function() {
+  mounted() {
     this.populateTable();
   },
-
 };
 </script>
 

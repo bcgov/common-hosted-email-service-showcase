@@ -5,44 +5,46 @@ export default {
   namespaced: true,
 
   state: {
-    alert: false,
-    // transactions in users current session
-    txs: [],
-    // history table data
+    // List of known transaction ids
+    txIds: [],
+    // History table data
     tableData: []
   },
 
   getters: {
-    alert: state => state.alert,
-    txs: state => state.txs,
+    txIds: state => state.txIds,
     tableData: state => state.tableData
   },
 
   mutations: {
-    ADD_TX(state, tx) {
-      state.txs.push(tx);
+    ADD_TXID(state, txId) {
+      state.txIds.push(txId);
     },
 
-    showAlert(state, alert){
-      if(alert){
-        state.alert = alert;
-      } else{
-        state.alert = false;
-      }
-    }
+    ADD_TABLEDATA(state, data) {
+      state.tableData.push(data);
+    },
 
+    CLEAR_TXID(state) {
+      state.txIds = [];
+    },
+
+    CLEAR_TABLEDATA(state) {
+      state.tableData = [];
+    }
   },
 
   actions: {
+    addTransaction({ commit }, txId) {
+      commit('ADD_TXID', txId);
+    },
 
-    // update state.txs with transaction from current user session
-    async addTx({ commit }, tx) {
-      try {
-        commit('ADD_TX', tx);
-      } catch {
-        console.log('addTx error'); // eslint-disable-line no-console
-      }
+    addTableData({ commit }, data) {
+      commit('ADD_TABLEDATA', data);
+    },
+
+    clearHistory({ commit }) {
+      commit('CLEAR_TXID');
     }
-
   }
 };

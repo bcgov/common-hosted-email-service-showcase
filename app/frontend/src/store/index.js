@@ -2,12 +2,13 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import createPersistedState from 'vuex-persistedstate';
 
-import ches from '@/store/modules/ches.js';
+import alert from '@/store/modules/alert';
+import ches from '@/store/modules/ches';
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-  modules: { ches },
+  modules: { alert, ches },
   plugins: [
     Vuex.createLogger(),
     createPersistedState({
