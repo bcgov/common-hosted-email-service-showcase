@@ -1,16 +1,11 @@
 <template>
   <v-container class="pa-0 mt-10">
-    <v-form
-      ref="emailForm"
-      :disabled="emailFormDisabled"
-      lazy-validation
-      :key="componentKey"
-    >
+    <v-form ref="form" :disabled="formDisabled" lazy-validation>
       <v-row>
         <v-col cols="12" md="6" class="disabled-input-container">
           <label>Sender</label>
           <v-text-field
-            v-model="userName"
+            v-model="currentUserEmail"
             hide-details="auto"
             readonly
             outlined
@@ -21,7 +16,7 @@
           <label>Recipients</label>
           <div class="d-flex flex-row">
             <v-combobox
-              v-model="email.recipients"
+              v-model="form.recipients"
               v-bind:rules="emailRequiredRule.concat(emailArrayRules)"
               clearable
               hint="Add one or more valid email addresses"
@@ -60,7 +55,7 @@
         <v-col cols="12" md="6">
           <label>CC</label>
           <v-combobox
-            v-model="email.cc"
+            v-model="form.cc"
             :rules="emailArrayRules"
             clearable
             hint="Add one or more valid email addresses"
@@ -87,7 +82,7 @@
         <v-col cols="12" md="6">
           <label>BCC</label>
           <v-combobox
-            v-model="email.bcc"
+            v-model="form.bcc"
             :rules="emailArrayRules"
             clearable
             hint="Add one or more valid email addresses"
@@ -114,10 +109,22 @@
       </v-row>
 
       <v-row>
+        <!-- delay -->
+        <v-col cols="12" md="4" class="dateTimePicker-wrapper">
+          <label>Delay Until (optional)</label>
+          <v-datetime-picker
+            dense
+            outlined
+            hide-details="auto"
+            v-model="form.delay"
+          ></v-datetime-picker>
+        </v-col>
+
+        <!-- priority -->
         <v-col cols="12" md="4">
           <label>Priority</label>
           <v-select
-            v-model="email.priority"
+            v-model="form.priority"
             :items="emailPriorityOptions"
             item-text="text"
             item-value="value"
@@ -128,43 +135,11 @@
           ></v-select>
         </v-col>
 
-        <!-- delay field -->
-        <v-col cols="12" md="4">
-          <v-menu
-            v-model="delayMenu"
-            data-test="menu-form-startDate"
-            :close-on-content-click="true"
-            :nudge-right="40"
-            transition="scale-transition"
-            offset-y
-            min-width="290px"
-          >
-            <template v-slot:activator="{ on }">
-              <label>Delay Until (optional)</label>
-              <v-text-field
-                v-model="email.delay"
-                placeholder="yyyy-mm-dd"
-                append-icon="event"
-                v-on:click:append="delayMenu = true"
-                readonly
-                v-on="on"
-                dense
-                outlined
-                hide-details="auto"
-              ></v-text-field>
-            </template>
-            <v-date-picker
-              v-model="email.delay"
-              @input="delayMenu = false"
-            ></v-date-picker>
-          </v-menu>
-        </v-col>
-
-        <!-- Tag field -->
+        <!-- tag -->
         <v-col cols="12" md="4">
           <label>Tag (optional)</label>
           <v-text-field
-            v-model="email.tag"
+            v-model="form.tag"
             hide-details="auto"
             outlined
             dense
@@ -173,10 +148,11 @@
       </v-row>
 
       <v-row>
+        <!-- subject -->
         <v-col cols="12" md="12">
           <label>Subject (optional)</label>
           <v-text-field
-            v-model="email.subject"
+            v-model="form.subject"
             hide-details="auto"
             outlined
             dense
@@ -185,11 +161,12 @@
       </v-row>
 
       <v-row>
+        <!-- body format -->
         <v-col cols="12" md="12" class="pb-0">
           <div class="d-flex">
             <label class="mt-1">Body</label>
             <v-radio-group
-              v-model="email.bodyFormat"
+              v-model="form.bodyFormat"
               class="mt-0 ml-5 d-flex"
               hide-details="auto"
             >
@@ -201,9 +178,10 @@
       </v-row>
 
       <v-row>
+        <!-- body -->
         <v-col cols="12" md="12">
           <v-textarea
-            v-model="email.body"
+            v-model="form.body"
             :rules="bodyRequiredRule"
             hide-details="auto"
             outlined
@@ -214,8 +192,13 @@
         </v-col>
       </v-row>
 
+      <!-- Attachments -->
       <label>Attachments (optional)</label>
-      <Upload @filesUploaded="processAttachments($event)" class="my-3 py-3" />
+      <Upload
+        @filesUploaded="processAttachments($event)"
+        :fileCount="form.attachments.length"
+        class="my-3 py-3"
+      />
 
       <v-row justify="center" class="my-10">
         <v-col md="4">
@@ -224,7 +207,7 @@
           </v-btn>
         </v-col>
         <v-col md="4">
-          <v-btn width="100%" large outlined @click="clearForm">
+          <v-btn width="100%" large outlined @click="reloadForm">
             <span>Cancel</span>
           </v-btn>
         </v-col>
@@ -235,8 +218,8 @@
 
 <script>
 import chesService from '@/services/chesService';
-import { mapGetters, mapMutations, mapActions } from 'vuex';
-import Upload from '@/components/ches/Upload';
+import { mapMutations, mapActions } from 'vuex';
+import Upload from './Upload';
 
 export default {
   name: 'EmailForm',
@@ -244,21 +227,21 @@ export default {
     Upload,
   },
   data: () => ({
-    // email fields
-    email: {
+    // form fields
+    form: {
       attachments: [],
       bcc: [],
       body: '',
-      bodyFormat: 'html',
+      bodyFormat: 'txt',
       cc: [],
-      delay: '2021-04-15',
+      delay: null,
       priority: 'normal',
       recipients: [],
-      subject: 'CHES test email',
+      subject: '',
       tag: '',
     },
     // for display helpers
-    emailFormDisabled: false,
+    formDisabled: false,
     alert: false,
     showCcBcc: false,
     emailPriorityOptions: [
@@ -295,8 +278,10 @@ export default {
   }),
 
   computed: {
-    ...mapGetters('auth', ['userName']),
-    // ...mapGetters('ches', ['']),
+    // get current users email from auth vuex module
+    currentUserEmail() {
+      return this.$store.getters['auth/email'];
+    },
   },
 
   methods: {
@@ -304,23 +289,24 @@ export default {
     ...mapMutations('ches', ['showAlert']),
 
     async send() {
-
-      if (this.$refs.emailForm.validate()) {
-
+      if (this.$refs.form.validate()) {
         try {
           // create email object
           const email = {
-            attachments: this.email.attachments,
-            bcc: (this.showCcBcc) ? this.email.bcc : [],
-            body: this.email.body,
-            bodyType: this.email.bodyFormat,
-            cc: (this.showCcBcc) ? this.email.cc : [],
+            attachments: this.form.attachments,
+            bcc: this.showCcBcc ? this.form.bcc : [],
+            body: this.form.body,
+            bodyType: this.form.bodyFormat,
+            cc: this.showCcBcc ? this.form.cc : [],
             delayTS: 0,
-            from: this.userName,
-            priority: this.email.priority,
-            subject: this.email.subject,
-            tag: this.email.tag,
-            to: this.email.recipients,
+            from: this.currentUserEmail,
+            priority: this.form.priority,
+            subject:
+              this.form.subject !== ''
+                ? this.form.subject
+                : 'Email from CHES-SHowcase',
+            tag: this.form.tag,
+            to: this.form.recipients,
           };
           // send email with ches service
           const response = await chesService.email(email);
@@ -328,22 +314,24 @@ export default {
           // show success alert
           this.alert = {
             type: 'success',
-            text: '<strong>Your email has been successfully sent.<br />Transaction ID:</strong>' + response.txId +  ' <strong>Message ID:</strong>' +  response.messages[0].msgId
+            text:
+              '<strong>Your email has been successfully sent.<br />Transaction ID:</strong>' +
+              response.txId +
+              ' <strong>Message ID:</strong>' +
+              response.messages[0].msgId,
           };
 
           // update store
           await this.addTx(response);
-          this.clearForm();
-
+          this.reloadForm();
         } catch (e) {
           this.error = true;
           // show error alert
           this.alert = {
             type: 'error',
-            text: e
+            text: e,
           };
         }
-
         this.showAlert(this.alert);
       }
       // else form has validation error
@@ -358,7 +346,7 @@ export default {
           return this.convertFileToAttachment(file);
         })
       );
-      this.email.attachments = attachments;
+      this.form.attachments = attachments;
     },
 
     async convertFileToAttachment(file) {
@@ -380,53 +368,69 @@ export default {
       });
     },
 
-    // download message response in in csv format
-    // downloadMsg(response){
-    //   try {
-    //     if (response && response.data) {
-    //       const blob = new Blob([response.data], {
-    //         type: response.headers['content-type'],
-    //       });
-    //       const url = window.URL.createObjectURL(blob);
-    //       const a = document.createElement('a');
-    //       a.href = url;
-    //       a.download = 'msg';
-    //       a.style.display = 'none';
-    //       a.classList.add('hiddenDownloadTextElement');
-    //       document.body.appendChild(a);
-    //       a.click();
-    //       document.body.removeChild(a);
-    //     } else {
-    //       throw new Error('No data in response from exportSubmissions call');
-    //     }
-    //   }
-    //   catch (error){
-    //     console.log('error!');
-    //   }
-    // },
+    reloadForm() {
+      //this.$refs.emailForm.reset();
 
+      this.$refs.form.resetValidation();
 
-    clearForm() {
+      this.form = {
+        attachments: [],
+        bcc: [],
+        body: '',
+        bodyFormat: 'txt',
+        cc: [],
+        delay: null,
+        priority: 'normal',
+        recipients: [],
+        subject: '',
+        tag: '',
+      };
+
+      const el = document.querySelector('.dateTimePicker-wrapper');
+      const input = (el.querySelector('input').value = '');
+      if (input) input.value = '';
+
+      window.scrollTo(0, 0);
     },
   },
+
+  mounted() {},
 };
 </script>
 
-<style scoped>
-.disabled-input-container >>> .v-input {
+<style scoped lang="scss">
+.disabled-input-container ::v-deep .v-input {
   background-color: #f2f2f2;
-  color: blue;
 }
 /* select text was getting cut off at the bottom */
-.v-select >>> .v-select__selections {
+.v-select ::v-deep .v-select__selections {
   line-height: 22px;
 }
 /* make radio buttons inline */
-.v-input--radio-group >>> .v-input--radio-group__input {
+.v-input--radio-group ::v-deep .v-input--radio-group__input {
   flex-direction: row !important;
 }
-.v-input--radio-group >>> .v-input--radio-group__input > div {
+.v-input--radio-group ::v-deep .v-input--radio-group__input > div {
   margin-bottom: 0 !important;
   margin-left: 2rem;
+}
+/* make datetimepicker look ike other fields :( */
+.dateTimePicker-wrapper ::v-deep .v-input {
+  padding-top: 0;
+  margin-top: 0;
+  input {
+    border: 1px solid #606060 !important;
+    border-radius: 3px;
+    padding: 1.2rem 0.7rem;
+  }
+  .v-input__slot::before {
+    display: none;
+  }
+  .v-text-field__details {
+    display: none;
+  }
+  :after {
+    display: none;
+  }
 }
 </style>

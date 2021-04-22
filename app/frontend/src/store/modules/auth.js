@@ -19,6 +19,7 @@ export default {
     createLoginUrl: () => options => Vue.prototype.$keycloak.createLoginUrl(options),
     createLogoutUrl: () => options => Vue.prototype.$keycloak.createLogoutUrl(options),
     fullName: () => Vue.prototype.$keycloak.fullName,
+    email: () => Vue.prototype.$keycloak.tokenParsed ? Vue.prototype.$keycloak.tokenParsed.email : '',
     hasResourceRoles: (_state, getters) => (resource, roles) => {
       if (!getters.authenticated) return false;
       if (!roles.length) return true; // No roles to check against

@@ -59,7 +59,18 @@ import * as constants from '../../utils/constants';
 export default {
   name: 'Upload',
 
-  props: {},
+  // clear upload div ('files' array) if parent form is reset
+  props: [
+    'fileCount'
+  ],
+  watch: {
+    fileCount: function(newVal, oldVal) {
+      console.log('Prop changed: ', newVal, ' | was: ', oldVal);
+      if(newVal == 0){
+        this.files = [];
+      }
+    }
+  },
 
   data() {
     return {
