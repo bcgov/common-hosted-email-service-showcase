@@ -369,10 +369,7 @@ export default {
     },
 
     reloadForm() {
-      //this.$refs.emailForm.reset();
-
       this.$refs.form.resetValidation();
-
       this.form = {
         attachments: [],
         bcc: [],
@@ -393,8 +390,6 @@ export default {
       window.scrollTo(0, 0);
     },
   },
-
-  mounted() {},
 };
 </script>
 
