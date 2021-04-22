@@ -218,7 +218,7 @@
 
 <script>
 import chesService from '@/services/chesService';
-import { mapMutations, mapActions } from 'vuex';
+import { mapActions } from 'vuex';
 import Upload from './Upload';
 
 export default {
@@ -285,8 +285,8 @@ export default {
   },
 
   methods: {
-    ...mapActions('ches', ['addTx']),
-    ...mapMutations('ches', ['showAlert']),
+    ...mapActions('alert', ['showAlert']),
+    ...mapActions('ches', ['addTransaction']),
 
     async send() {
       if (this.$refs.form.validate()) {
@@ -312,39 +312,31 @@ export default {
           const response = await chesService.email(email);
 
           // show success alert
-          this.alert = {
+          this.showAlert({
             type: 'success',
             text:
-              '<strong>Your email has been successfully sent.<br />Transaction ID:</strong>' +
-              response.txId +
-              ' <strong>Message ID:</strong>' +
-              response.messages[0].msgId,
-          };
+              `<strong>Your email has been successfully sent.<br />Transaction ID: </strong>${response.txId} <strong>Message ID: </strong> ${response.messages[0].msgId}`,
+          });
 
           // update store
-          await this.addTx(response);
+          this.addTransaction(response);
           this.reloadForm();
         } catch (e) {
           this.error = true;
           // show error alert
-          this.alert = {
+          this.showAlert({
             type: 'error',
             text: e,
-          };
+          });
         }
-        this.showAlert(this.alert);
-      }
-      // else form has validation error
-      else {
+      } else { // else form has validation error
         window.scrollTo(0, 0);
       }
     },
 
     async processAttachments(files) {
       const attachments = await Promise.all(
-        files.map((file) => {
-          return this.convertFileToAttachment(file);
-        })
+        files.map((file) => this.convertFileToAttachment(file))
       );
       this.form.attachments = attachments;
     },
@@ -369,10 +361,7 @@ export default {
     },
 
     reloadForm() {
-      //this.$refs.emailForm.reset();
-
       this.$refs.form.resetValidation();
-
       this.form = {
         attachments: [],
         bcc: [],
@@ -393,8 +382,6 @@ export default {
       window.scrollTo(0, 0);
     },
   },
-
-  mounted() {},
 };
 </script>
 
