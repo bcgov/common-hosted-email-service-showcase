@@ -62,6 +62,7 @@ export default {
   props: [
     'fileCount'
   ],
+
   watch: {
     fileCount(newVal, oldVal) {
       console.log('Prop changed: ', newVal, ' | was: ', oldVal); // eslint-disable-line no-console
