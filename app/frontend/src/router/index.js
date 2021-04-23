@@ -37,12 +37,12 @@ export default function getRouter(basePath = '/') {
           {
             path: 'send',
             name: 'EmailSend',
-            component: () => import(/* webpackChunkName: "emailsend" */ '@/views/EmailSend.vue')
+            component: () => import(/* webpackChunkName: "emailsend" */ '@/views/email/EmailSend.vue')
           },
           {
             path: 'history',
             name: 'EmailHistory',
-            component: () => import(/* webpackChunkName: "emailhistory" */ '@/views/EmailHistory.vue')
+            component: () => import(/* webpackChunkName: "emailhistory" */ '@/views/email/EmailHistory.vue')
           }
         ],
         meta: {
