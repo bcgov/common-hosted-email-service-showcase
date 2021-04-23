@@ -21,9 +21,8 @@ const sendEmail = async (req, res, next) => {
 };
 
 const getStatus = async (req, res, next) => {
-  let params = Object.values(req.params).every(param => param !== undefined) ? req.params : req.query;
   try {
-    const { data, status } = await chesService.getStatus(params);
+    const { data, status } = await chesService.getStatus(req.params, req.query);
     res.status(status).json(data);
   } catch (error) {
     next(error);
@@ -31,9 +30,8 @@ const getStatus = async (req, res, next) => {
 };
 
 const cancel = async (req, res, next) => {
-  let params = Object.values(req.params).every(param => param !== undefined) ? req.params : req.query;
   try {
-    const { data, status } = await chesService.cancel(params);
+    const { data, status } = await chesService.cancel(req.params, req.query);
     res.status(status).json(data);
   } catch (error) {
     next(error);
@@ -63,9 +61,8 @@ const mergePreview = async (req, res, next) => {
 };
 
 const promote = async (req, res, next) => {
-  let params = Object.values(req.params).every(param => param !== undefined) ? req.params : req.query;
   try {
-    const { data, status } = await chesService.promote(params);
+    const { data, status } = await chesService.promote(req.params, req.query);
     res.status(status).json(data);
   } catch (error) {
     next(error);

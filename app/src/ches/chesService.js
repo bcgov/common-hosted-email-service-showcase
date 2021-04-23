@@ -35,35 +35,59 @@ class ChesService {
     }
   }
 
-  async getStatus(params) {
+  async getStatus(params, query) {
     try {
-      const { data, status } = await this.axios.get(
-        `${this.apiUrl}/status`,
-        {
-          params: params,
-          headers: {
-            'Content-Type': 'application/json'
+      if (params && params.msgId) {
+        const { data, status } = await this.axios.get(
+          `${this.apiUrl}/status/${params.msgId}`,
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            }
           }
-        }
-      );
-      return { data, status };
+        );
+        return { data, status };
+      } else {
+        const { data, status } = await this.axios.get(
+          `${this.apiUrl}/status`,
+          {
+            params: query,
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+        return { data, status };
+      }
     } catch (e) {
       errorToProblem(SERVICE, e);
     }
   }
 
-  async cancel(params) {
+  async cancel(params, query) {
     try {
-      const { data, status } = await this.axios.delete(
-        `${this.apiUrl}/cancel`,
-        {
-          params: params,
-          headers: {
-            'Content-Type': 'application/json'
+      if (params && params.msgId) {
+        const { data, status } = await this.axios.delete(
+          `${this.apiUrl}/cancel/${params.msgId}`,
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            }
           }
-        }
-      );
-      return { data, status };
+        );
+        return { data, status };
+      } else {
+        const { data, status } = await this.axios.delete(
+          `${this.apiUrl}/cancel`,
+          {
+            params: query,
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+        return { data, status };
+      }
     } catch (e) {
       errorToProblem(SERVICE, e);
     }
@@ -126,18 +150,30 @@ class ChesService {
     }
   }
 
-  async promote(params) {
+  async promote(params, query) {
     try {
-      const { data, status } = await this.axios.post(
-        `${this.apiUrl}/promote`,
-        {
-          params: params,
-          headers: {
-            'Content-Type': 'application/json'
+      if (params && params.msgId) {
+        const { data, status } = await this.axios.post(
+          `${this.apiUrl}/promote/${params.msgId}`,
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            }
           }
-        }
-      );
-      return { data, status };
+        );
+        return { data, status };
+      } else {
+        const { data, status } = await this.axios.post(
+          `${this.apiUrl}/promote`,
+          {
+            params: query,
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+        return { data, status };
+      }
     } catch (e) {
       errorToProblem(SERVICE, e);
     }

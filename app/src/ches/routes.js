@@ -3,11 +3,10 @@ const routes = require('express').Router();
 const keycloak = require('../components/keycloak');
 const controller = require('./controller');
 
-routes.get('/health', async (req, res, next) => {
+routes.get('/health', keycloak.protect(), async (req, res, next) => {
   await controller.healthCheck(req, res, next);
 });
 
-// routes.get('/email', keycloak.protect(protector), (req, res, next) => {
 routes.post('/email', keycloak.protect(), async (req, res, next) => {
   await controller.sendEmail(req, res, next);
 });
