@@ -217,10 +217,12 @@
 </template>
 
 <script>
-import DatetimePicker from '@/components/vuetify/DatetimePicker';
-import chesService from '@/services/chesService';
 import { mapActions } from 'vuex';
-import Upload from './Upload';
+
+import DatetimePicker from '@/components/vuetify/DatetimePicker';
+import Upload from '@/components/ches/Upload';
+
+import chesService from '@/services/chesService';
 
 export default {
   name: 'EmailForm',

@@ -59,12 +59,12 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <slot name="actions" :parent="this">
-          <v-btn color="grey lighten-1" text @click.native="clearHandler">{{
-            clearText
-          }}</v-btn>
-          <v-btn color="green darken-1" text @click="okHandler">{{
-            okText
-          }}</v-btn>
+          <v-btn text outlined @click.native="clearHandler">
+            <span>{{ clearText }}</span>
+          </v-btn>
+          <v-btn color="primary" @click="okHandler">
+            <span>{{ okText }}</span>
+          </v-btn>
         </slot>
       </v-card-actions>
     </v-card>
@@ -214,7 +214,7 @@ export default {
     },
   },
   watch: {
-    datetime: function () {
+    datetime() {
       this.init();
     },
   },
