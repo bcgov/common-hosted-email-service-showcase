@@ -113,9 +113,10 @@
         <v-col cols="12" md="4" class="dateTimePicker-wrapper">
           <label>Delay Until (optional)</label>
           <v-datetime-picker
-            dense
-            outlined
-            hide-details="auto"
+            :text-field-props="{
+              dense: true,
+              outlined: true
+            }"
             v-model="form.datetime"
           ></v-datetime-picker>
         </v-col>
@@ -170,7 +171,7 @@
               class="mt-0 ml-5 d-flex"
               hide-details="auto"
             >
-              <v-radio class="" label="Plain Text" value="txt"></v-radio>
+              <v-radio class="" label="Plain Text" value="text"></v-radio>
               <v-radio class="" label="HTML" value="html"></v-radio>
             </v-radio-group>
           </div>
@@ -180,15 +181,25 @@
       <v-row>
         <!-- body -->
         <v-col cols="12" md="12">
-          <v-textarea
-            v-model="form.body"
-            :rules="bodyRequiredRule"
-            hide-details="auto"
-            outlined
-            dense
-            value="Enter your email body here."
-            class="mb-3"
-          ></v-textarea>
+          <!-- for now just use textarea for text and html -->
+          <div v-if="form.bodyFormat === 'text' || 'html'">
+            <v-textarea
+              v-model="form.body"
+              :rules="bodyRequiredRule"
+              hide-details="auto"
+              outlined
+              dense
+              value="Enter your email body here."
+              class="mb-3"
+            ></v-textarea>
+          </div>
+          <div v-else>
+            <!--
+            <div class="editor">
+              <editor api-key="no-api-key" :init="{plugins: 'wordcount'}" />
+            </div>
+          -->
+          </div>
         </v-col>
       </v-row>
 
@@ -224,11 +235,16 @@ import Upload from '@/components/ches/Upload';
 
 import chesService from '@/services/chesService';
 
+// might want this editor. but it does require signing up for a free plan
+// https://www.tiny.cloud/docs/integrations/vue/
+// import Editor from '@tinymce/tinymce-vue';
+
 export default {
   name: 'EmailForm',
   components: {
     Upload,
-    'v-datetime-picker': DatetimePicker
+    'v-datetime-picker': DatetimePicker,
+    // editor: Editor,
   },
   data: () => ({
     // form fields
@@ -236,7 +252,7 @@ export default {
       attachments: [],
       bcc: [],
       body: '',
-      bodyFormat: 'txt',
+      bodyFormat: 'text',
       cc: [],
       datetime: null,
       priority: 'normal',
@@ -253,7 +269,6 @@ export default {
       { text: 'High', value: 'high' },
       { text: 'Low', value: 'low' },
     ],
-    delayMenu: false,
     // at least one email required in combobox
     emailRequiredRule: [
       (v) => {
@@ -289,7 +304,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('alert', ['showAlert']),
+    ...mapActions('alert', ['showAlert', 'clearAlert']),
     ...mapActions('ches', ['addTransaction']),
 
     async send() {
@@ -299,10 +314,10 @@ export default {
           const email = {
             attachments: this.form.attachments,
             bcc: this.showCcBcc ? this.form.bcc : [],
-            body: this.form.body,
+            body: this.form.bodyFormat === 'text' ? this.form.body : '<html>'+this.form.bodyFormat+'</html>',
             bodyType: this.form.bodyFormat,
             cc: this.showCcBcc ? this.form.cc : [],
-            delayTS: 0,
+            delayTS: this.form.datetime !== null ? new Date(this.form.datetime).getTime() : 0,
             from: this.currentUserEmail,
             priority: this.form.priority,
             subject:
@@ -312,8 +327,10 @@ export default {
             tag: this.form.tag,
             to: this.form.recipients,
           };
+
           // send email with ches service
           const response = await chesService.email(email);
+          //const response = console.log(chesService.email(email));
 
           // show success alert
           this.showAlert({
@@ -366,11 +383,12 @@ export default {
 
     reloadForm() {
       this.$refs.form.resetValidation();
+
       this.form = {
         attachments: [],
         bcc: [],
         body: '',
-        bodyFormat: 'txt',
+        bodyFormat: 'text',
         cc: [],
         datetime: null,
         priority: 'normal',
@@ -378,10 +396,12 @@ export default {
         subject: '',
         tag: '',
       };
-
       window.scrollTo(0, 0);
     },
   },
+  mounted(){
+    this.clearAlert();
+  }
 };
 </script>
 
@@ -400,24 +420,5 @@ export default {
 .v-input--radio-group ::v-deep .v-input--radio-group__input > div {
   margin-bottom: 0 !important;
   margin-left: 2rem;
-}
-/* make datetimepicker look ike other fields :( */
-.dateTimePicker-wrapper ::v-deep .v-input {
-  padding-top: 0;
-  margin-top: 0;
-  input {
-    border: 1px solid #606060 !important;
-    border-radius: 3px;
-    padding: 1.2rem 0.7rem;
-  }
-  .v-input__slot::before {
-    display: none;
-  }
-  .v-text-field__details {
-    display: none;
-  }
-  :after {
-    display: none;
-  }
 }
 </style>

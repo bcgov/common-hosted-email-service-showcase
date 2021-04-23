@@ -12,6 +12,7 @@ import getRouter from '@/router';
 import store from '@/store';
 import VueKeycloakJs from '@/plugins/keycloak';
 import vuetify from '@/plugins/vuetify';
+// import Editor from '@tinymce/tinymce-vue';
 
 Vue.config.productionTip = false;
 
@@ -36,6 +37,8 @@ loadConfig();
  */
 function initializeApp(kcSuccess = false, basePath = '/') {
   if (kcSuccess && !store.hasModule('auth')) store.registerModule('auth', auth);
+
+  // Vue.use(Editor);
 
   new Vue({
     router: getRouter(basePath),
