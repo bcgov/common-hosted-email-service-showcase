@@ -116,7 +116,7 @@
             dense
             outlined
             hide-details="auto"
-            v-model="form.delay"
+            v-model="form.datetime"
           ></v-datetime-picker>
         </v-col>
 
@@ -217,14 +217,18 @@
 </template>
 
 <script>
-import chesService from '@/services/chesService';
 import { mapActions } from 'vuex';
-import Upload from './Upload';
+
+import DatetimePicker from '@/components/vuetify/DatetimePicker';
+import Upload from '@/components/ches/Upload';
+
+import chesService from '@/services/chesService';
 
 export default {
   name: 'EmailForm',
   components: {
     Upload,
+    'v-datetime-picker': DatetimePicker
   },
   data: () => ({
     // form fields
@@ -234,7 +238,7 @@ export default {
       body: '',
       bodyFormat: 'txt',
       cc: [],
-      delay: null,
+      datetime: null,
       priority: 'normal',
       recipients: [],
       subject: '',
@@ -368,16 +372,12 @@ export default {
         body: '',
         bodyFormat: 'txt',
         cc: [],
-        delay: null,
+        datetime: null,
         priority: 'normal',
         recipients: [],
         subject: '',
         tag: '',
       };
-
-      const el = document.querySelector('.dateTimePicker-wrapper');
-      const input = (el.querySelector('input').value = '');
-      if (input) input.value = '';
 
       window.scrollTo(0, 0);
     },
