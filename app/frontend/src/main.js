@@ -12,7 +12,6 @@ import getRouter from '@/router';
 import store from '@/store';
 import VueKeycloakJs from '@/plugins/keycloak';
 import vuetify from '@/plugins/vuetify';
-import DatetimePicker from 'vuetify-datetime-picker';
 
 Vue.config.productionTip = false;
 
@@ -37,9 +36,6 @@ loadConfig();
  */
 function initializeApp(kcSuccess = false, basePath = '/') {
   if (kcSuccess && !store.hasModule('auth')) store.registerModule('auth', auth);
-
-  // install plugins
-  Vue.use(DatetimePicker);
 
   new Vue({
     router: getRouter(basePath),
