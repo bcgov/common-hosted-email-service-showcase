@@ -11,10 +11,19 @@ export default {
     return appAxios().get(ApiRoutes.CHES_HEALTH);
   },
 
+  /**
+  * @function cancel
+  * Attempt to cancel an email message
+  * @param {string} msgId The messageId
+  * @returns {Promise} An axios response
+  */
+  cancel(msgId) {
+    return appAxios().get(`${ApiRoutes.CHES_CANCEL}/${msgId}`);
+  },
 
   /**
   * @function email
-  * Dispatches an email to CHES
+  * Dispatches an email
   * @param {string} email The email message
   * @returns {Promise} An axios response
   */
@@ -34,6 +43,16 @@ export default {
         txId: txId
       }
     });
-  }
+  },
+
+  /**
+  * @function promote
+  * Attempt to promote an email message
+  * @param {string} msgId The messageId
+  * @returns {Promise} An axios response
+  */
+  promote(msgId) {
+    return appAxios().get(`${ApiRoutes.CHES_PROMOTE}/${msgId}`);
+  },
 };
 
