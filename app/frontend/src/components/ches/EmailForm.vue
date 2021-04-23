@@ -42,7 +42,7 @@
 
             <v-btn
               outlined
-              class="ml-5 mt-1float-right"
+              class="ml-5 mt-1 float-right"
               color="primary"
               @click="showCcBcc = !showCcBcc"
             >
@@ -155,6 +155,7 @@
           <label>Subject (optional)</label>
           <v-text-field
             v-model="form.subject"
+            :rules="[v => !!v || 'Subject is required']"
             hide-details="auto"
             outlined
             dense
@@ -181,35 +182,37 @@
 
       <v-row>
         <!-- body -->
-        <v-col cols="12" md="12">
-          <div v-if="form.bodyFormat === 'text'">
-            <v-textarea
-              v-model="form.body"
-              :rules="bodyRequiredRule"
-              hide-details="auto"
-              outlined
-              dense
-              value="Enter your email body here."
-              class="mb-3"
-            ></v-textarea>
-          </div>
-          <div v-else class="editor">
-            <ckeditor
-              :editor="editor"
-              v-model="form.body"
-              :config="editorConfig"
-            ></ckeditor>
-          </div>
+        <v-col cols="12" md="12" class="bodyDiv">
+          <v-textarea
+            v-if="form.bodyFormat === 'text'"
+            v-model="form.body"
+            :rules="bodyRequiredRule"
+            hide-details="auto"
+            outlined
+            dense
+            value="Enter your email body here."
+            class="mb-3"
+          ></v-textarea>
+          <ckeditor
+            v-else
+            :editor="editor"
+            v-model="form.body"
+            :config="editorConfig"
+          ></ckeditor>
         </v-col>
       </v-row>
 
-      <!-- Attachments -->
-      <label>Attachments (optional)</label>
-      <Upload
-        @filesUploaded="processAttachments($event)"
-        :fileCount="form.attachments.length"
-        class="my-3 py-3"
-      />
+      <v-row>
+        <!-- Attachments -->
+        <v-col cols="12" md="12">
+          <label>Attachments (optional)</label>
+          <Upload
+            @filesUploaded="processAttachments($event)"
+            :fileCount="form.attachments.length"
+            class="my-3 py-3"
+          />
+        </v-col>
+      </v-row>
 
       <v-row justify="center" class="my-10">
         <v-col md="4">
@@ -235,7 +238,7 @@ import Upload from '@/components/ches/Upload';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 import chesService from '@/services/chesService';
-import * as constants from '../../utils/constants';
+import { Regex } from '../../utils/constants';
 
 export default {
   name: 'EmailForm',
@@ -279,7 +282,7 @@ export default {
     // emails in combobox must be valid
     emailArrayRules: [
       (v) =>
-        v.every((item) => new RegExp(constants.Regex.EMAIL).test(item)) ||
+        v.every((item) => new RegExp(Regex.EMAIL).test(item)) ||
         'Please enter all valid email addresses',
     ],
     bodyRequiredRule: [(v) => !!v || 'Email Body is required'],
@@ -312,10 +315,7 @@ export default {
                 : 0,
             from: this.currentUserEmail,
             priority: this.form.priority,
-            subject:
-              this.form.subject !== ''
-                ? this.form.subject
-                : 'Email from CHES-SHowcase',
+            subject: this.form.subject,
             tag: this.form.tag,
             to: this.form.recipients,
           };
@@ -413,7 +413,7 @@ export default {
   margin-left: 2rem;
 }
 /* give wysiwyg editor a min height */
-.editor ::v-deep .ck-editor__editable {
-  min-height:200px;
+.bodyDiv ::v-deep .ck-editor__editable {
+  min-height:180px;
 }
 </style>
