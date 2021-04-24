@@ -11,31 +11,48 @@ export default {
     return appAxios().get(ApiRoutes.CHES_HEALTH);
   },
 
-
-  async email(email) {
-    const response = await appAxios().post(ApiRoutes.CHES_EMAIL, email)
-      .catch(e => {
-        if (e && e.response && e.response.status === 422) {
-          console.log('error sending Email'); // eslint-disable-line no-console
-        } else {
-          throw Error('Could not send email using CHES API: ' + e.message);
-        }
-      });
-
-    return response.data;
+  /**
+  * @function cancel
+  * Attempt to cancel an email message
+  * @param {string} msgId The messageId
+  * @returns {Promise} An axios response
+  */
+  cancel(msgId) {
+    return appAxios().get(`${ApiRoutes.CHES_CANCEL}/${msgId}`);
   },
 
-  async getStatusByTransactionId(txId) {
-    const response = await appAxios().get(`${ApiRoutes.CHES_STATUS_TX}?txId=${txId}`)
-      .catch(e => {
-        if (e && e.response && e.response.status === 422) {
-          console.log('error getting status by transaction ID'); // eslint-disable-line no-console
-        } else {
-          throw Error('Could get message status by transaction ID using CHES API: ' + e.message);
-        }
-      });
+  /**
+  * @function email
+  * Dispatches an email
+  * @param {string} email The email message
+  * @returns {Promise} An axios response
+  */
+  email(email) {
+    return appAxios().post(ApiRoutes.CHES_EMAIL, email);
+  },
 
-    return response.data;
-  }
+  /**
+  * @function getStatusByTransactionId
+  * Find email status(es) via transactionId
+  * @param {string} txId The transactionId
+  * @returns {Promise} An axios response
+  */
+  getStatusByTransactionId(txId) {
+    return appAxios().get(ApiRoutes.CHES_STATUS, {
+      params: {
+        txId: txId
+      }
+    });
+  },
+
+  /**
+  * @function promote
+  * Attempt to promote an email message
+  * @param {string} msgId The messageId
+  * @returns {Promise} An axios response
+  */
+  promote(msgId) {
+    return appAxios().get(`${ApiRoutes.CHES_PROMOTE}/${msgId}`);
+  },
 };
 

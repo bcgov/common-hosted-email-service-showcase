@@ -1,7 +1,9 @@
 export const ApiRoutes = Object.freeze({
-  CHES_HEALTH: '/ches/health',
+  CHES_CANCEL: '/ches/cancel',
   CHES_EMAIL: '/ches/email',
-  CHES_STATUS_TX: '/ches/status'
+  CHES_HEALTH: '/ches/health',
+  CHES_PROMOTE: '/ches/promote',
+  CHES_STATUS: '/ches/status'
 });
 
 export const AppRoles = Object.freeze({
