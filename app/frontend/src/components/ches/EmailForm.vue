@@ -322,7 +322,6 @@ export default {
 
           // send email with ches service
           const { data } = await chesService.email(email);
-          //const response = console.log(chesService.email(email));
 
           // show success alert
           this.showAlert({
