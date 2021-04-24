@@ -44,6 +44,7 @@ export default {
   },
 
   methods: {
+    ...mapActions('alert', ['showAlert', 'clearAlert']),
     ...mapActions('ches', ['addTableData']),
 
     // get status details for each message in tansactions in store
@@ -53,23 +54,29 @@ export default {
 
       try {
         // for each email transaction in store, get full status of messages
-        this.txIds.forEach(async tx => {
+        this.txIds.forEach(async (tx) => {
           // if transaction isnt already in 'this.tableData' (vuex tableData property)
-          if(!(this.tableData.find(o => o.txId === tx.txId))) {
+          if (!this.tableData.find((o) => o.txId === tx.txId)) {
             // get status details from CHES and add to tableData
-            const response = await chesService.getStatusByTransactionId(tx.txId);
-            this.addTableData(...response);
+            const { data } = await chesService.getStatusByTransactionId(
+              tx.txId
+            );
+            this.addTableData(...data);
           }
         });
       } catch (e) {
         this.error = true;
-        this.tableData = e;
+        this.showAlert({
+          type: 'error',
+          text: e,
+        });
       }
       this.loading = false;
     },
   },
 
   mounted() {
+    this.clearAlert();
     this.populateTable();
   },
 };

@@ -321,16 +321,18 @@ export default {
           };
 
           // send email with ches service
-          const response = await chesService.email(email);
+          const { data } = await chesService.email(email);
+          //const response = console.log(chesService.email(email));
 
           // show success alert
           this.showAlert({
             type: 'success',
-            text: `<strong>Your email has been successfully sent.<br />Transaction ID: </strong>${response.txId} <strong>Message ID: </strong> ${response.messages[0].msgId}`,
+            text:
+              `<strong>Your email has been successfully sent.<br />Transaction ID: </strong>${data.txId} <strong>Message ID: </strong> ${data.messages[0].msgId}`,
           });
 
           // update store
-          this.addTransaction(response);
+          this.addTransaction(data);
           this.reloadForm();
         } catch (e) {
           this.error = true;
