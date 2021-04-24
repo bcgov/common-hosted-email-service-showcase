@@ -18,7 +18,8 @@
   },
   "dependencies": {
     "@bcgov/bc-sans": "^1.0.1",
-    "@tinymce/tinymce-vue": "^3.2.8",
+    "@ckeditor/ckeditor5-build-classic": "^27.1.0",
+    "@ckeditor/ckeditor5-vue2": "^1.0.5",
     "axios": "^0.21.1",
     "core-js": "^3.10.1",
     "date-fns": "^2.21.1",

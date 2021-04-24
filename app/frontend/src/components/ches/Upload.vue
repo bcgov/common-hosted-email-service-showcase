@@ -52,9 +52,8 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex';
-import * as constants from '../../utils/constants';
-
+import { mapActions } from 'vuex';
+import { Attachments } from '@/utils/constants';
 
 export default {
   name: 'Upload',
@@ -80,7 +79,7 @@ export default {
   },
 
   methods: {
-    ...mapMutations('ches', ['showAlert']),
+    ...mapActions('alert', ['showAlert', 'clearAlert']),
 
     addFiles(e) {
       this.dragover = false;
@@ -102,6 +101,7 @@ export default {
       else {
         // Send uploaded files to parent component
         this.$emit('filesUploaded', this.files);
+        this.clearAlert();
       }
     },
 
@@ -121,7 +121,7 @@ export default {
     removeFile(fileName) {
       // get index of file
       const index = this.files.findIndex((file) => file.name === fileName);
-      // if file is uploaded files remove it
+      // if file was added, remove it
       if (index > -1) this.files.splice(index, 1);
       // re-send uploaded files to parent component
       this.$emit('filesUploaded', this.files);
@@ -133,7 +133,7 @@ export default {
         files.length === 0
           ? 0
           : files.map((f) => f.size).reduce((a, b) => a + b);
-      return (attachmentsSize <= constants.ATTACHMENT_SIZE_LIMIT) ? true : false;
+      return (attachmentsSize <= Attachments.ATTACHMENT_SIZE_LIMIT) ? true : false;
     },
   },
 };

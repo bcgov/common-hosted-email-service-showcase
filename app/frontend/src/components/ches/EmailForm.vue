@@ -42,7 +42,7 @@
 
             <v-btn
               outlined
-              class="ml-5 mt-1float-right"
+              class="ml-5 mt-1 float-right"
               color="primary"
               @click="showCcBcc = !showCcBcc"
             >
@@ -115,7 +115,8 @@
           <v-datetime-picker
             :text-field-props="{
               dense: true,
-              outlined: true
+              outlined: true,
+              'hide-details': 'auto',
             }"
             v-model="form.datetime"
           ></v-datetime-picker>
@@ -154,6 +155,7 @@
           <label>Subject (optional)</label>
           <v-text-field
             v-model="form.subject"
+            :rules="[v => !!v || 'Subject is required']"
             hide-details="auto"
             outlined
             dense
@@ -180,36 +182,37 @@
 
       <v-row>
         <!-- body -->
-        <v-col cols="12" md="12">
-          <!-- for now just use textarea for text and html -->
-          <div v-if="form.bodyFormat === 'text' || 'html'">
-            <v-textarea
-              v-model="form.body"
-              :rules="bodyRequiredRule"
-              hide-details="auto"
-              outlined
-              dense
-              value="Enter your email body here."
-              class="mb-3"
-            ></v-textarea>
-          </div>
-          <div v-else>
-            <!--
-            <div class="editor">
-              <editor api-key="no-api-key" :init="{plugins: 'wordcount'}" />
-            </div>
-          -->
-          </div>
+        <v-col cols="12" md="12" class="bodyDiv">
+          <v-textarea
+            v-if="form.bodyFormat === 'text'"
+            v-model="form.body"
+            :rules="bodyRequiredRule"
+            hide-details="auto"
+            outlined
+            dense
+            value="Enter your email body here."
+            class="mb-3"
+          ></v-textarea>
+          <ckeditor
+            v-else
+            :editor="editor"
+            v-model="form.body"
+            :config="editorConfig"
+          ></ckeditor>
         </v-col>
       </v-row>
 
-      <!-- Attachments -->
-      <label>Attachments (optional)</label>
-      <Upload
-        @filesUploaded="processAttachments($event)"
-        :fileCount="form.attachments.length"
-        class="my-3 py-3"
-      />
+      <v-row>
+        <!-- Attachments -->
+        <v-col cols="12" md="12">
+          <label>Attachments (optional)</label>
+          <Upload
+            @filesUploaded="processAttachments($event)"
+            :fileCount="form.attachments.length"
+            class="my-3 py-3"
+          />
+        </v-col>
+      </v-row>
 
       <v-row justify="center" class="my-10">
         <v-col md="4">
@@ -232,19 +235,16 @@ import { mapActions } from 'vuex';
 
 import DatetimePicker from '@/components/vuetify/DatetimePicker';
 import Upload from '@/components/ches/Upload';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 import chesService from '@/services/chesService';
-
-// might want this editor. but it does require signing up for a free plan
-// https://www.tiny.cloud/docs/integrations/vue/
-// import Editor from '@tinymce/tinymce-vue';
+import { Regex } from '../../utils/constants';
 
 export default {
   name: 'EmailForm',
   components: {
     Upload,
     'v-datetime-picker': DatetimePicker,
-    // editor: Editor,
   },
   data: () => ({
     // form fields
@@ -262,36 +262,28 @@ export default {
     },
     // for display helpers
     formDisabled: false,
-    alert: false,
     showCcBcc: false,
     emailPriorityOptions: [
       { text: 'Normal', value: 'normal' },
       { text: 'High', value: 'high' },
       { text: 'Low', value: 'low' },
     ],
+    editor: ClassicEditor,
+    editorConfig: {
+      toolbar: {
+        items: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote'],
+      },
+    },
+
     // at least one email required in combobox
     emailRequiredRule: [
-      (v) => {
-        if (v.length < 1) {
-          return 'A Recipient E-mail is required';
-        } else {
-          return true;
-        }
-      },
+      (v) => v.length > 0 || 'Please enter at least 1 email address',
     ],
     // emails in combobox must be valid
     emailArrayRules: [
-      (v) => {
-        for (let i = 0; i < v.length; i++) {
-          if (
-            !/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/.test(
-              v[i]
-            )
-          )
-            return 'Please check your email address format';
-        }
-        return true;
-      },
+      (v) =>
+        v.every((item) => new RegExp(Regex.EMAIL).test(item)) ||
+        'Please enter all valid email addresses',
     ],
     bodyRequiredRule: [(v) => !!v || 'Email Body is required'],
   }),
@@ -314,29 +306,27 @@ export default {
           const email = {
             attachments: this.form.attachments,
             bcc: this.showCcBcc ? this.form.bcc : [],
-            body: this.form.bodyFormat === 'text' ? this.form.body : '<html>'+this.form.bodyFormat+'</html>',
+            body: this.form.body ,
             bodyType: this.form.bodyFormat,
             cc: this.showCcBcc ? this.form.cc : [],
-            delayTS: this.form.datetime !== null ? new Date(this.form.datetime).getTime() : 0,
+            delayTS:
+              this.form.datetime !== null
+                ? new Date(this.form.datetime).getTime()
+                : 0,
             from: this.currentUserEmail,
             priority: this.form.priority,
-            subject:
-              this.form.subject !== ''
-                ? this.form.subject
-                : 'Email from CHES-SHowcase',
+            subject: this.form.subject,
             tag: this.form.tag,
             to: this.form.recipients,
           };
 
           // send email with ches service
           const response = await chesService.email(email);
-          //const response = console.log(chesService.email(email));
 
           // show success alert
           this.showAlert({
             type: 'success',
-            text:
-              `<strong>Your email has been successfully sent.<br />Transaction ID: </strong>${response.txId} <strong>Message ID: </strong> ${response.messages[0].msgId}`,
+            text: `<strong>Your email has been successfully sent.<br />Transaction ID: </strong>${response.txId} <strong>Message ID: </strong> ${response.messages[0].msgId}`,
           });
 
           // update store
@@ -350,7 +340,8 @@ export default {
             text: e,
           });
         }
-      } else { // else form has validation error
+      } else {
+        // else form has validation error
         window.scrollTo(0, 0);
       }
     },
@@ -399,9 +390,9 @@ export default {
       window.scrollTo(0, 0);
     },
   },
-  mounted(){
+  mounted() {
     this.clearAlert();
-  }
+  },
 };
 </script>
 
@@ -420,5 +411,9 @@ export default {
 .v-input--radio-group ::v-deep .v-input--radio-group__input > div {
   margin-bottom: 0 !important;
   margin-left: 2rem;
+}
+/* give wysiwyg editor a min height */
+.bodyDiv ::v-deep .ck-editor__editable {
+  min-height:180px;
 }
 </style>
