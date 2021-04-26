@@ -109,8 +109,8 @@ The template can be manually invoked and deployed via Openshift CLI. For example
 ```sh
 export NAMESPACE=<yournamespace>
 
-oc process -n $NAMESPACE -f openshift/app.bc.yaml -p REPO_NAME=vue-scaffold
- -p JOB_NAME=master -p SOURCE_REPO_URL=https://github.com/bcgov/vue-scaffold.git -p SOURCE_REPO_REF=master -o yaml | oc apply -n $NAMESPACE -f -
+oc process -n $NAMESPACE -f openshift/app.bc.yaml -p REPO_NAME=common-hosted-email-service-showcase
+ -p JOB_NAME=master -p SOURCE_REPO_URL=https://github.com/bcgov/common-hosted-email-service-showcase.git -p SOURCE_REPO_REF=master -o yaml | oc apply -n $NAMESPACE -f -
 ```
 
 Note that these build configurations do not have any triggers defined. They will be invoked by the Jenkins pipeline, started manually in the console, or by an equivalent oc command for example:
@@ -148,7 +148,7 @@ The Jenkins pipeline will handle deployment invocation automatically. However sh
 export NAMESPACE=<yournamespace>
 export APP_NAME=<yourappshortname>
 
-oc process -n $NAMESPACE -f openshift/app.dc.yaml -p REPO_NAME=vue-scaffold -p JOB_NAME=master -p NAMESPACE=$NAMESPACE -p APP_NAME=$APP_NAME -p ROUTE_HOST=$APP_NAME-dev.pathfinder.gov.bc.ca -p ROUTE_PATH=master -o yaml | oc apply -n $NAMESPACE -f -
+oc process -n $NAMESPACE -f openshift/app.dc.yaml -p REPO_NAME=common-hosted-email-service-showcase -p JOB_NAME=master -p NAMESPACE=$NAMESPACE -p APP_NAME=$APP_NAME -p ROUTE_HOST=$APP_NAME-dev.pathfinder.gov.bc.ca -p ROUTE_PATH=master -o yaml | oc apply -n $NAMESPACE -f -
 ```
 
 Due to the triggers that are set in the deploymentconfig, the deployment will begin automatically. However, you can deploy manually by use the following command for example:
