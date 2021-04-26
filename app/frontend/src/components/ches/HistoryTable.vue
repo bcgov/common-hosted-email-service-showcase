@@ -16,7 +16,7 @@
       :items="tableData"
       :search="search"
     >
-      <template #[`item.actions`]="{ item }">
+      <!-- <template #[`item.actions`]="{ item }">
         <v-tooltip bottom>
           <template #activator="{ on, attrs }">
             <v-btn
@@ -49,7 +49,7 @@
           </template>
           <span>Cancel Scheduled Send</span>
         </v-tooltip>
-      </template>
+      </template> -->
     </v-data-table>
   </v-container>
 </template>
@@ -70,13 +70,13 @@ export default {
       { text: 'Tag', align: 'start', value: 'tag' },
       { text: 'Status', align: 'start', value: 'status' },
       { text: 'Delayed', align: 'start', value: 'delayTS' },
-      {
-        text: 'Actions',
-        align: 'end',
-        value: 'actions',
-        filterable: false,
-        sortable: false,
-      },
+      // {
+      //   text: 'Actions',
+      //   align: 'end',
+      //   value: 'actions',
+      //   filterable: false,
+      //   sortable: false,
+      // },
     ],
   }),
 
@@ -102,6 +102,7 @@ export default {
       this.loading = true;
 
       try {
+        // TODO: Move this logic into vuex - do this BEFORE adding in remove/promote logic
         // for each email transaction in store, get full status of messages
         this.txIds.forEach(async (tx) => {
           // if transaction isnt already in 'this.tableData' (vuex tableData property)
