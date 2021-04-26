@@ -32,14 +32,14 @@ export PUBLIC_KEY=<yourkeycloakpublickey>
 oc create -n $NAMESPACE configmap $APP_NAME-frontend-config \
   --from-literal=FRONTEND_APIPATH=api/v1 \
   --from-literal=FRONTEND_BASEPATH=/app \
-  --from-literal=FRONTEND_KC_REALM=vehizw2t \
+  --from-literal=FRONTEND_KC_REALM=98r0z7rz \
   --from-literal=FRONTEND_KC_SERVERURL=https://dev.oidc.gov.bc.ca/auth
 ```
 
 ```sh
 oc create -n $NAMESPACE configmap $APP_NAME-sc-config \
-  --from-literal=SC_CS_CHES_ENDPOINT=https://ches-dev.pathfinder.gov.bc.ca/api \
-  --from-literal=SC_CS_CDOGS_ENDPOINT=https://cdogs-dev.pathfinder.gov.bc.ca/api \
+  --from-literal=SC_CS_CHES_ENDPOINT=https://ches-dev.apps.silver.devops.gov.bc.ca/api \
+  --from-literal=SC_CS_CDOGS_ENDPOINT=https://cdogs-dev.apps.silver.devops.gov.bc.ca/api \
   --from-literal=SC_CS_TOKEN_ENDPOINT=https://dev.oidc.gov.bc.ca/auth/realms/jbd6rnxw/protocol/openid-connect/token
 ```
 
@@ -49,7 +49,7 @@ oc create -n $NAMESPACE configmap $APP_NAME-server-config \
   --from-literal=SERVER_BASEPATH=/app \
   --from-literal=SERVER_BODYLIMIT=30mb \
   --from-literal=SERVER_KC_PUBLICKEY=$PUBLIC_KEY \
-  --from-literal=SERVER_KC_REALM=vehizw2t \
+  --from-literal=SERVER_KC_REALM=98r0z7rz \
   --from-literal=SERVER_KC_SERVERURL=https://dev.oidc.gov.bc.ca/auth \
   --from-literal=SERVER_LOGLEVEL=info \
   --from-literal=SERVER_MORGANFORMAT=combined \
@@ -148,7 +148,7 @@ The Jenkins pipeline will handle deployment invocation automatically. However sh
 export NAMESPACE=<yournamespace>
 export APP_NAME=<yourappshortname>
 
-oc process -n $NAMESPACE -f openshift/app.dc.yaml -p REPO_NAME=common-hosted-email-service-showcase -p JOB_NAME=master -p NAMESPACE=$NAMESPACE -p APP_NAME=$APP_NAME -p ROUTE_HOST=$APP_NAME-dev.pathfinder.gov.bc.ca -p ROUTE_PATH=master -o yaml | oc apply -n $NAMESPACE -f -
+oc process -n $NAMESPACE -f openshift/app.dc.yaml -p REPO_NAME=common-hosted-email-service-showcase -p JOB_NAME=master -p NAMESPACE=$NAMESPACE -p APP_NAME=$APP_NAME -p ROUTE_HOST=$APP_NAME-dev.apps.silver.devops.gov.bc.ca -p ROUTE_PATH=master -o yaml | oc apply -n $NAMESPACE -f -
 ```
 
 Due to the triggers that are set in the deploymentconfig, the deployment will begin automatically. However, you can deploy manually by use the following command for example:
