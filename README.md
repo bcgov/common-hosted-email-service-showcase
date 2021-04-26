@@ -1,9 +1,9 @@
 
-# Common Hosted Email Service Showcase [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE) [![img](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md)
+# CHES Showcase [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE) [![img](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md)
 
 ![Tests](https://github.com/bcgov/common-hosted-email-service-showcase/workflows/Tests/badge.svg)
-[![Maintainability](https://api.codeclimate.com/v1/badges/e7f26d580793ba73b7f7/maintainability)](https://codeclimate.com/github/bcgov/common-hosted-email-service-showcase/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/e7f26d580793ba73b7f7/test_coverage)](https://codeclimate.com/github/bcgov/common-hosted-email-service-showcase/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/3d1538f768e99d86e8c6/maintainability)](https://codeclimate.com/github/bcgov/common-hosted-email-service-showcase/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/3d1538f768e99d86e8c6/test_coverage)](https://codeclimate.com/github/bcgov/common-hosted-email-service-showcase/test_coverage)
 
 A showcase application for the Common Hosted Email Service (CHES).
 
