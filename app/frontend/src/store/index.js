@@ -8,6 +8,7 @@ import ches from '@/store/modules/ches';
 Vue.use(Vuex);
 
 const plugins = [
+  // TODO: figure out on page boot issue wiping out localStorage before it is read
   createPersistedState({
     paths: ['ches'],
     storage: localStorage
