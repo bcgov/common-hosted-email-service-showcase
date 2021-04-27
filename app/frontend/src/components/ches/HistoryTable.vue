@@ -16,6 +16,14 @@
       :items="tableData"
       :search="search"
     >
+      <template #[`item.tag`]="{ item }">
+        <span>{{ item.tag ? item.tag : '-'}}</span>
+      </template>
+
+      <template #[`item.delayTS`]="{ item }">
+        <span>{{ humanDateTime(item.delayTS) }}</span>
+      </template>
+
       <!-- <template #[`item.actions`]="{ item }">
         <v-tooltip bottom>
           <template #activator="{ on, attrs }">
@@ -55,6 +63,7 @@
 </template>
 
 <script>
+import { format } from 'date-fns';
 import { mapActions, mapGetters } from 'vuex';
 import chesService from '@/services/chesService';
 
@@ -69,7 +78,7 @@ export default {
       { text: 'Message ID', align: 'start', value: 'msgId' },
       { text: 'Tag', align: 'start', value: 'tag' },
       { text: 'Status', align: 'start', value: 'status' },
-      { text: 'Delayed', align: 'start', value: 'delayTS' },
+      { text: 'Delayed', align: 'start', value: 'delayTS', width: 150 },
       // {
       //   text: 'Actions',
       //   align: 'end',
@@ -127,6 +136,11 @@ export default {
     promoteMessage(msgId) {
       console.log('promoteMessage', msgId); // eslint-disable-line no-console
     },
+
+    humanDateTime(timestamp){
+      // date-fns docs: https://date-fns.org/v2.21.1/docs/Getting-Started
+      return timestamp === 0 ? '-' : format(new Date(timestamp), 'yyyy-MM-dd HH:mm');
+    }
   },
 
   mounted() {
