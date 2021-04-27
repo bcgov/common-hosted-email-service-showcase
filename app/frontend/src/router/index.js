@@ -51,6 +51,14 @@ export default function getRouter(basePath = '/') {
         }
       },
       {
+        path: 'performance',
+        name: 'Performance',
+        component: () => import(/* webpackChunkName: "performance" */ '@/views/Performance.vue'),
+        meta: {
+          hasLogin: true
+        }
+      },
+      {
         path: '/404',
         alias: '*',
         name: 'NotFound',

@@ -2,6 +2,7 @@
   "frontend": {
     "apiPath": "FRONTEND_APIPATH",
     "basePath": "FRONTEND_BASEPATH",
+    "dashboardUrl": "FRONTEND_DASHBOARDURL",
     "keycloak": {
       "clientId": "FRONTEND_KC_CLIENTID",
       "realm": "FRONTEND_KC_REALM",

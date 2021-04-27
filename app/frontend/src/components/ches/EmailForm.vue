@@ -152,7 +152,7 @@
       <v-row>
         <!-- subject -->
         <v-col cols="12" md="12">
-          <label>Subject (optional)</label>
+          <label>Subject</label>
           <v-text-field
             v-model="form.subject"
             :rules="[v => !!v || 'Subject is required']"
