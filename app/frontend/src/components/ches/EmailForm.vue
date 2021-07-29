@@ -235,6 +235,8 @@ import { mapActions } from 'vuex';
 
 import DatetimePicker from '@/components/vuetify/DatetimePicker';
 import Upload from '@/components/ches/Upload';
+
+import CKEditor from '@ckeditor/ckeditor5-vue2';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 import chesService from '@/services/chesService';
@@ -245,9 +247,10 @@ export default {
   components: {
     Upload,
     'v-datetime-picker': DatetimePicker,
+    ckeditor: CKEditor.component
   },
   data: () => ({
-    // form fields
+    // form data fields
     form: {
       attachments: [],
       bcc: [],

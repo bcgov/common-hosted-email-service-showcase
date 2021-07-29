@@ -52,6 +52,14 @@
 </template>
 
 <script>
+
+/**
+ * This component handles the UI for the email attachments.
+ * It shows the user a drag/drop message and then lists the files added.
+ * The attached files are added to a 'files' array and then emitted
+ * to the parent form component, where the data is added to the form POST.
+ */
+
 import { mapActions } from 'vuex';
 import { Attachments } from '@/utils/constants';
 
