@@ -45,7 +45,7 @@
         <!-- contextsType -->
         <v-col class="pb-0 col-md-8">
           <div class="d-flex">
-            <label class="mt-1">Contexts</label>
+            <label class="flex-label">Contexts</label>
             <v-radio-group
               v-model="contextsType"
               class="mt-0 ml-5 d-flex"
@@ -97,10 +97,7 @@
       <!-- Excel -->
       <v-row v-if="contextsType === 'xlsx'">
         <v-col cols="12" md="12">
-          <UploadContexts
-            @contextsFileUploaded="onContextsFileUploaded"
-            class=""
-          />
+          <UploadContexts />
         </v-col>
       </v-row>
 
@@ -119,10 +116,10 @@
       </v-row>
 
       <v-row>
-        <!-- body format -->
+        <!-- body Type -->
         <v-col cols="12" md="12" class="pb-0">
           <div class="d-flex">
-            <label class="mt-1">Body Format</label>
+            <label class="flex-label">Body Format</label>
             <v-radio-group
               v-model="bodyType"
               class="mt-0 ml-5 d-flex"
@@ -137,35 +134,48 @@
 
       <v-row>
         <!-- body -->
-        <v-col cols="12" md="12" class="bodyDiv">
-          <v-tabs vertical>
+        <v-col cols="12" md="12">
+          <v-tabs vertical class="merge-tabs">
             <v-tab> Body </v-tab>
-            <v-tab> Variables </v-tab>
+            <v-tab v-if="contextVariables.length">Variables </v-tab>
 
             <v-tab-item>
+              <!-- text -->
               <v-textarea
                 v-if="bodyType === 'text'"
-                v-model="body"
+                v-model="bodyText"
                 :rules="bodyRequiredRule"
                 hide-details="auto"
                 outlined
                 dense
                 class="mb-3"
               ></v-textarea>
-              <ckeditor
-                v-else
-                :editor="editor"
-                v-model="body"
-                :config="editorConfig"
-              ></ckeditor>
+              <!-- html -->
+              <div v-else>
+                <Ckeditor
+                  v-model="bodyHtml"
+                  :value.sync="bodyHtml"
+                ></Ckeditor>
+                <!-- show validation message if html body is empty -->
+                <div v-if="bodyHtmlErrors.length > 0" class="v-text-field__details pt-1">
+                  <div class="v-messages theme--light error--text" role="alert">
+                    <div class="v-messages__wrapper">
+                      <div v-for="bodyHtmlError in bodyHtmlErrors" :key="bodyHtmlErrors.indexOf(bodyHtmlError)" class="v-messages__message">
+                        {{ bodyHtmlError }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </v-tab-item>
 
             <v-tab-item>
-              <v-simple-table dense striped>
+              <v-simple-table dense class="contexts-table">
                 <template v-slot:default>
                   <tbody>
                     <tr
-                      v-for="variable in contextVariables" :key="contextVariables.indexOf(variable)"
+                      v-for="variable in contextVariables"
+                      :key="contextVariables.indexOf(variable)"
                     >
                       <td>
                         {{ variable }}
@@ -192,14 +202,27 @@
       </v-row>
 
       <v-row justify="center" class="my-10">
-        <v-col md="4">
-          <v-btn width="100%" large color="primary" @click="send()">
-            <span>Send</span>
-          </v-btn>
-        </v-col>
-        <v-col md="4">
+        <!-- cancel button -->
+        <v-col md="6">
           <v-btn width="100%" large outlined @click="reloadForm">
             <span>Cancel</span>
+          </v-btn>
+        </v-col>
+        <!-- preview button -->
+        <!-- <v-col md="4">
+          <v-btn width="100%" large outlined @click="loadPreview()">
+            <span>Preview</span>
+          </v-btn>
+          <MergePreviewDialog
+            :show="showPreviewDialog"
+            @close-dialog="showPreviewDialog = false"
+          >
+          </MergePreviewDialog>
+        </v-col> -->
+        <!-- Send button -->
+        <v-col md="6">
+          <v-btn width="100%" large color="primary" @click="send()">
+            <span>Send</span>
           </v-btn>
         </v-col>
       </v-row>
@@ -211,47 +234,37 @@
 import { mapActions } from 'vuex';
 import { mapFields } from 'vuex-map-fields';
 
-import CKEditor from '@ckeditor/ckeditor5-vue2';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-// import SourceEditing from '@ckeditor/ckeditor5-source-editing';
-
 import chesService from '@/services/chesService';
+
+import * as Utils from '@/utils/utils';
+
 import Upload from '@/components/ches/Upload';
 import UploadContexts from '@/components/ches/UploadContexts';
+import Ckeditor from '@/components/ches/Ckeditor';
+// import MergePreviewDialog from '@/components/ches/MergePreviewDialog';
 
 export default {
   name: 'MergeForm',
   components: {
     Upload,
     UploadContexts,
-    ckeditor: CKEditor.component
+    Ckeditor,
+    // MergePreviewDialog,
   },
 
   data: () => ({
-    showDeleteContextsExcelDialog: false,
 
-    formDisabled: false,
+    bodyHtmlErrors: [],
     emailPriorityOptions: [
       { text: 'Normal', value: 'normal' },
       { text: 'High', value: 'high' },
       { text: 'Low', value: 'low' },
     ],
-    // ckeditor
-    editor: ClassicEditor,
-    editorConfig: {
-      toolbar: {
-        items: [
-          'heading',
-          '|',
-          'bold',
-          'italic',
-          'link',
-          'bulletedList',
-          'numberedList',
-          'blockQuote',
-        ],
-      },
-    },
+    formDisabled: false,
+
+    showDeleteContextsExcelDialog: false,
+    // TODO: show preview in modal
+    // showPreviewDialog: false,
 
     // validation
     bodyRequiredRule: [(v) => !!v || 'Email Body is required'],
@@ -259,10 +272,10 @@ export default {
 
   computed: {
     // get form data from vuex
-    // ...mapGetters('ches', ['mergeForm']),
     ...mapFields('ches', [
       'mergeForm.attachments',
-      'mergeForm.body',
+      'mergeForm.bodyHtml',
+      'mergeForm.bodyText',
       'mergeForm.bodyType',
       'mergeForm.priority',
       'mergeForm.recipients',
@@ -272,11 +285,27 @@ export default {
       'mergeForm.excel',
       'mergeForm.contexts',
       'mergeForm.contextVariables',
+      'mergeForm',
+
+      // TODO: add preview data to store
+      // 'mergePreview',
     ]),
 
     // get current users email from vuex
     currentUserEmail() {
       return this.$store.getters['auth/email'];
+    },
+  },
+
+  watch: {
+    // show validation message if bodyHtml is empty
+    bodyHtml: function (bodyHtml) {
+      if (bodyHtml == '') {
+        this.bodyHtmlErrors.push('Email Body is required');
+      }
+      else{
+        this.bodyHtmlErrors = [];
+      }
     },
   },
 
@@ -286,33 +315,67 @@ export default {
     // alert actions in vuex
     ...mapActions('alert', ['showAlert', 'clearAlert']),
 
-    // send email(s)
+    // ---- Preview ----
+    async loadPreview() {
+      // if form is valid
+      if (this.$refs.form.validate()) {
+        try {
+          // create new object with all fields
+          const formData = {
+            attachments: this.attachments,
+            bodyType: this.bodyType,
+            body: this.bodyType == 'text' ? this.bodyText : this.bodyHtml,
+            from: this.currentUserEmail,
+            subject: this.subject,
+            priority: this.priority,
+            contexts: Utils.getContextsObject(this.contexts),
+          };
+          // get preview data returned from CHES api
+          const { data } = await chesService.mergePreview(formData);
+          if (data && data.length > 0) {
+            // TODO: build 'mergePreviewData' data object here
+            // show in modal
+            // this.showPreviewDialog = true;
+          }
+        } catch (e) {
+          this.error = true;
+          // show error alert
+          this.showAlert({
+            type: 'error',
+            text: e,
+          });
+        }
+      } else {
+        // else form has validation error
+        window.scrollTo(0, 0);
+      }
+    },
+
+    // ---- Send Mail Merge ----
     async send() {
       if (this.$refs.form.validate()) {
         try {
-          // create email object
+          // create new object with all fields
           const email = {
             attachments: this.attachments,
-            body: this.body,
             bodyType: this.bodyType,
-            contextsType: this.contextsType,
+            body: this.bodyType === 'html' ? this.bodyHtml : this.bodyText,
+            contexts: Utils.getContextsObject(this.contexts),
             from: this.currentUserEmail,
             priority: this.priority,
             subject: this.subject,
-            to: this.recipients,
           };
-
           // send email with ches service
-          const { data } = await chesService.email(email);
+          const { data } = await chesService.merge(email);
 
           // show success alert
           this.showAlert({
             type: 'success',
-            text: `<strong>Your email has been successfully sent.<br />Transaction ID: </strong>${data.txId} <strong>Message ID: </strong> ${data.messages[0].msgId}`,
+            text: `<strong>Your Mail Merge has been successfully sent.<br />Transaction ID: </strong>${data.txId}`,
           });
-
-          // update store
+          // add emails to history table
           this.addTransaction(data);
+          // reset form
           this.reloadForm();
         } catch (e) {
           this.error = true;
@@ -328,65 +391,49 @@ export default {
       }
     },
 
-    onContextsFileUploaded(value) {
-      alert('ooo');
-
-      if (value) this.excelParsed = true;
-    },
-
     // remove contexts from Excel file
     deleteContextsExcel() {
       // clear props
+      this.contextVariables = [];
       this.contexts = '';
       this.excelParsed = false;
       // close dialog
       this.showDeleteContextsExcelDialog = false;
     },
 
-    // handle email attachments
+    // Attachments
     async processAttachments(files) {
       const attachments = await Promise.all(
-        files.map((file) => this.convertFileToAttachment(file))
+        files.map((file) => Utils.convertFileToAttachment(file))
       );
       this.attachments = attachments;
-    },
-
-    async convertFileToAttachment(file) {
-      const content = await this.fileToBase64(file);
-      return {
-        content: content,
-        contentType: file.type,
-        filename: file.name,
-        encoding: 'base64',
-      };
-    },
-
-    async fileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result.replace(/^.*,/, ''));
-        reader.onerror = (error) => reject(error);
-      });
     },
 
     // reset form
     reloadForm() {
       this.$refs.form.resetValidation();
-
       // reset store:
-      // this.mergeForm = {
-      //   ...this.mergeForm,
-      //   ...{
-      //     attachments: [],
-      //     body: '',
-      //     bodyType: 'text',
-      //     priority: 'normal',
-      //     recipients: [],
-      //     subject: '',
-      //   },
-      // };
-
+      this.mergeForm = {
+        ...this.mergeForm,
+        ...{
+          attachments: [],
+          bodyHtml: '',
+          bodyText: '',
+          bodyType: 'html',
+          priority: 'normal',
+          recipients: [],
+          subject: '',
+          contextsType: 'xlsx',
+          excelParsed: false,
+          excel: {
+            cols: [],
+            data: [],
+            headers: [],
+          },
+          contexts: '',
+          contextVariables: [],
+        },
+      };
       window.scrollTo(0, 0);
     },
   },
@@ -404,13 +451,20 @@ export default {
 .v-select ::v-deep .v-select__selections {
   line-height: 22px;
 }
+/* inline labels */
+.flex-label {
+  width: 6rem;
+  margin-top: 6px;
+}
 /* make radio buttons inline */
 .v-input--radio-group ::v-deep .v-input--radio-group__input {
   flex-direction: row !important;
-}
-.v-input--radio-group ::v-deep .v-input--radio-group__input > div {
-  margin-bottom: 0 !important;
-  margin-left: 2rem;
+  & > div {
+    margin-bottom: 0 !important;
+    &:not(:first-child) {
+      margin-left: 2rem;
+    }
+  }
 }
 .json-textarea ::v-deep textarea {
   font-size: 85%;
@@ -418,8 +472,35 @@ export default {
   font-family: courier;
   padding: 1rem 0;
 }
+/* style excel stuff */
+.contexts-table {
+  border: 1px solid grey;
+}
 /* give wysiwyg editor a min height */
 .bodyDiv ::v-deep .ck-editor__editable {
   min-height: 180px;
+}
+/* un-style variables/body tabs */
+.merge-tabs ::v-deep {
+  .v-tabs-slider-wrapper {
+    display: none;
+  }
+  .v-tab {
+    padding: 0 3rem 0 0;
+    justify-content: start;
+    text-transform: none;
+    color: black;
+    &:hover,
+    &::before,
+    &::after {
+      background: none;
+    }
+    &.v-tab--active {
+      font-size: 14px;
+    }
+    & > span {
+      display: none;
+    }
+  }
 }
 </style>

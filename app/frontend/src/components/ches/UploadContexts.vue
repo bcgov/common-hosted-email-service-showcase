@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="excelParsed">
-      <v-simple-table dense striped>
+      <v-simple-table dense class="contexts-table">
         <template v-slot:default>
           <thead>
             <th
@@ -70,30 +70,18 @@ import { mapActions } from 'vuex';
 import { mapFields } from 'vuex-map-fields';
 
 import { Contexts, Formats } from '@/utils/constants';
+import * as Utils from '@/utils/utils';
 
 export default {
   name: 'UploadContexts',
 
-  // // clear excel file upload div (excelFileParsed) if parent form is reset
-  // props: ['contextsExcelUploaded'],
-
-  // watch: {
-  //   contextsExcelUploaded(newVal) {
-  //     if (newVal === false) {
-  //       this.mergeForm.excelFile = true;
-  //     }
-  //   },
-  // },
-
   data() {
     return {
       dragover: false,
-      // excelParsed: false,
     };
   },
 
   computed: {
-    // ...mapGetters('ches', ['mergeForm'])
     ...mapFields('ches', [
       'mergeForm.excelParsed',
       'mergeForm.excel',
@@ -105,14 +93,11 @@ export default {
 
   methods: {
     ...mapActions('alert', ['showAlert', 'clearAlert']),
-    // ...mapActions('ches', ['addContexts']),
-    // ...mapActions('ches', ['addTransaction']),
 
     addExcelFile(e) {
       this.dragover = false;
 
       const file = e.dataTransfer.file;
-
       // validate Excel file
       if (!this.validateFile(file)) {
         // show error alert
@@ -126,10 +111,8 @@ export default {
       else {
         // parse file
         this.parseFile(file, this.addContextsToStore);
-
         // make file data avalable in parent component
         this.$emit('fileUploaded', file);
-
         // show table of contexts
         this.excelParsed = true;
 
@@ -187,13 +170,13 @@ export default {
             let fieldName = excel.headers[0][f.key];
             switch (fieldName.toLowerCase()) {
               case 'to':
-                r.to = this.getAddresses(d[f.key]);
+                r.to = Utils.getAddresses(d[f.key]);
                 break;
               case 'cc':
-                r.cc = this.getAddresses(d[f.key]);
+                r.cc = Utils.getAddresses(d[f.key]);
                 break;
               case 'bcc':
-                r.bcc = this.getAddresses(d[f.key]);
+                r.bcc = Utils.getAddresses(d[f.key]);
                 break;
               case 'tag':
                 r.tag = d[f.key];
@@ -228,23 +211,9 @@ export default {
       else reader.readAsArrayBuffer(file);
     },
 
-    // // add to store
-    // addContextsToStore(data) {
-    //   let { excel, contexts, contextVariables } = data;
-    //   this.addContexts({
-    //     excel: excel,
-    //     contexts: contexts,
-    //     contextsType: 'xlsx',
-    //     contextVariables: contextVariables,
-    //   });
-    // },
-
-    // map fields on store
+    // add fields to store
     addContextsToStore(data) {
       let { excel, contexts, contextVariables } = data;
-
-      console.log('ok', contextVariables);
-
       this.excel = excel;
       this.contexts = contexts;
       this.contextsType = 'xlsx';
@@ -262,36 +231,10 @@ export default {
     sanitizeHeaders(headers) {
       let result = [];
       headers.forEach((c) => {
-        let h = this.makeHeaderUnique(result, this.toCamelCase(c));
+        let h = this.makeHeaderUnique(result, Utils.toCamelCase(c));
         result.push(h);
       });
       return result;
-    },
-
-    toCamelCase(str) {
-      // lowercase the str
-      // replace whitespace with _
-      // remove all non-alphanumeric (except _)
-      // remove all repeated _ with single _
-      // remove all _ and change next character to Uppercase
-      const result = str
-        .toLowerCase()
-        .replace(/ /g, '_')
-        .replace(/\W/g, '')
-        .replace(/_+/g, '_')
-        .replace(/_([a-z])/g, function (m) {
-          return m.toUpperCase();
-        })
-        .replace(/_/g, '');
-      return result;
-    },
-
-    getAddresses(csv) {
-      if (csv && csv.trim().length > 0) {
-        return csv.split(',').map((item) => item.trim());
-      } else {
-        return [];
-      }
     },
 
     makeHeaderUnique(existing, original, val = original, count = 0) {
@@ -310,7 +253,6 @@ export default {
         return val;
       }
     },
-
     // turn contexts into nunjucks variables
     contextsToVariables(contexts) {
       let result = [];
@@ -417,9 +359,6 @@ export default {
       return fileSize <= Contexts.FILE_SIZE_LIMIT ? true : false;
     },
   },
-  mounted() {
-    // console.log('mergeForm.excel.headers', this.mergeForm.excel.headers);
-  },
 };
 </script>
 
@@ -428,11 +367,16 @@ export default {
   border: 3px dashed #606060;
   border-radius: 0.5rem;
 }
-
 .truncate {
   max-width: 1px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* style excel stuff */
+.contexts-table{
+  border: 1px solid grey;
+  padding: 10px;
+}
+
 </style>

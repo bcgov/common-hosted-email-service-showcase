@@ -42,7 +42,7 @@
             <li>For the body, click the HTML button to bring up the editor, then click View, click Source Code.
             </li>
             <li>Paste the contents of the example html template into the Source Code view and Save.</li>
-            <li>For the Subject, enter &quot;ATTN&#58; &#123;&#123;scope&#125;&#125;&#33;&quot;</li>
+            <li>For the Subject, enter <span v-pre>&quot;ATTN&#58; &#123;&#123;scope&#125;&#125;&#33;&quot;</span></li>
             <li>Click Preview</li>
           </ol>
 

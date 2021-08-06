@@ -46,6 +46,28 @@ export default {
   },
 
   /**
+  * @function getStatusByMessageId
+  * Find email status(es) via transactionId
+  * @param {string} msgId The transactionId
+  * @returns {Promise} An axios response
+  */
+  getStatusByMessageId(msgId) {
+    return appAxios().get(ApiRoutes.CHES_STATUS, {
+      params: {
+        msgId: msgId
+      }
+    });
+  },
+
+  merge(mergeData){
+    return appAxios().post(ApiRoutes.CHES_MERGE, mergeData);
+  },
+
+  mergePreview(mergeData){
+    return appAxios().post(ApiRoutes.CHES_MERGE_PREVIEW, mergeData);
+  },
+
+  /**
   * @function promote
   * Attempt to promote an email message
   * @param {string} msgId The messageId

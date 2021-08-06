@@ -1,4 +1,5 @@
 import { getField, updateField } from 'vuex-map-fields';
+import chesService from '@/services/chesService';
 
 /**
  * ches module
@@ -13,14 +14,14 @@ export default {
     tableData: [],
 
     // merge form
-    mergeForm : {
+    mergeForm: {
       attachments: [],
-      body: '',
+      bodyHtml: '',
+      bodyText: '',
       bodyType: 'html',
       priority: 'normal',
       recipients: [],
       subject: '',
-
       contextsType: 'xlsx',
       excelParsed: false,
       excel: {
@@ -31,6 +32,23 @@ export default {
       contexts: '',
       contextVariables: [],
     },
+
+    // merge preview
+    mergePreview: {
+      attachments: [],
+      data: [],
+      index: -1,
+      length: -1,
+      email: {
+        bodyType: '',
+        body: '',
+        from: '',
+        subject: '',
+        bcc: [],
+        cc: [],
+        to: []
+      }
+    },
     // eof merge form
 
   },
@@ -39,13 +57,13 @@ export default {
     getField, // vuex-map-fields
     txIds: state => state.txIds,
     tableData: state => state.tableData,
-
     // merge form
     mergeForm: state => state.mergeForm,
   },
 
   mutations: {
     updateField, // vuex-map-fields
+
     ADD_TXID(state, txId) {
       state.txIds.push(txId);
     },
@@ -61,16 +79,6 @@ export default {
     CLEAR_TABLEDATA(state) {
       state.tableData = [];
     },
-
-    // merge form
-    // ADD_CONTEXTS(state, data) {
-    //   console.log('store', state, data);
-    //   state.mergeForm = data;
-    // },
-    // UPDATE_CONTEXTS_TYPE(state, data) {
-    //   state.mergeForm.contextsType = data;
-    // }
-
   },
 
   actions: {
@@ -81,20 +89,37 @@ export default {
     addTableData({ commit }, data) {
       commit('ADD_TABLEDATA', data);
     },
+    // commit,
+    populateTable({ commit, state }, data) {
+      console.log('populateTable', data, state.txIds, state.tableData);
+
+      try {
+        // for each existing tx in txIds array
+        state.txIds.forEach(async (tx) => {
+          // if tableData doesnt contain an object with txId = tx.txId
+          if (!state.tableData.find((o) => o.txId === tx.txId)) {
+            // for each of the messages in tx
+            tx.messages.forEach(async (message) => {
+              // get details from CHES and add to tableData
+              const { data } = await chesService.getStatusByMessageId(
+                message.msgId
+              );
+              commit('ADD_TABLEDATA', ...data);
+            });
+          }
+        });
+
+      } catch (e) {
+        // this.error = true;
+        // this.showAlert({
+        //   type: 'error',
+        //   text: e,
+        // });
+      }
+    },
 
     clearHistory({ commit }) {
       commit('CLEAR_TXID');
     },
-
-    // merge form
-    // updateMergeForm({ commit }, data){
-    //   commit('UPDATE_MERGE_FORM', data);
-    // }
-    // addContexts({ commit }, data){
-    //   commit('ADD_CONTEXTS', data);
-    // },
-    // updateContextsType({ commit }, data){
-    //   commit('UPDATE_CONTEXTS_TYPE', data);
-    // }
   }
 };
