@@ -90,9 +90,7 @@ export default {
       commit('ADD_TABLEDATA', data);
     },
     // commit,
-    populateTable({ commit, state }, data) {
-      console.log('populateTable', data, state.txIds, state.tableData);
-
+    populateTable({ commit, state }) {
       try {
         // for each existing tx in txIds array
         state.txIds.forEach(async (tx) => {
