@@ -6,6 +6,7 @@
       :value="value"
       @input="$emit('update:value', $event)"
     ></ckeditor>
+
   </div>
 </template>
 
@@ -54,10 +55,3 @@ export default {
 
 };
 </script>
-
-<style scoped lang="scss">
-/* give wysiwyg editor a min height */
-.bodyDiv ::v-deep .ck-editor__editable {
-  min-height: 180px;
-}
-</style>

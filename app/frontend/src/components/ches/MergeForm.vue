@@ -1,5 +1,5 @@
 <template>
-  <v-form ref="form" :disabled="formDisabled" lazy-validation>
+  <v-form ref="form" lazy-validation>
     <v-container class="pa-0 mt-10">
       <v-row>
         <!-- sender -->
@@ -21,7 +21,6 @@
             :items="emailPriorityOptions"
             item-text="text"
             item-value="value"
-            placeholder="000-000-0000"
             hide-details="auto"
             outlined
             dense
@@ -45,7 +44,7 @@
         <!-- contextsType -->
         <v-col class="pb-0 col-md-8">
           <div class="d-flex">
-            <label class="flex-label">Contexts</label>
+            <label class="flex-label">Contexts (optional)</label>
             <v-radio-group
               v-model="contextsType"
               class="mt-0 ml-5 d-flex"
@@ -136,7 +135,7 @@
         <!-- body -->
         <v-col cols="12" md="12">
           <v-tabs vertical class="merge-tabs">
-            <v-tab> Body </v-tab>
+            <v-tab> Body</v-tab>
             <v-tab v-if="contextVariables.length">Variables </v-tab>
 
             <v-tab-item>
@@ -155,17 +154,9 @@
                 <Ckeditor
                   v-model="bodyHtml"
                   :value.sync="bodyHtml"
+                  :class="bodyHtmlErrors.length > 0 ? 'errorBorder' : ''"
                 ></Ckeditor>
-                <!-- show validation message if html body is empty -->
-                <div v-if="bodyHtmlErrors.length > 0" class="v-text-field__details pt-1">
-                  <div class="v-messages theme--light error--text" role="alert">
-                    <div class="v-messages__wrapper">
-                      <div v-for="bodyHtmlError in bodyHtmlErrors" :key="bodyHtmlErrors.indexOf(bodyHtmlError)" class="v-messages__message">
-                        {{ bodyHtmlError }}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <VMessages :value="bodyHtmlErrors" color="error" />
               </div>
             </v-tab-item>
 
@@ -255,12 +246,12 @@ export default {
   data: () => ({
 
     bodyHtmlErrors: [],
+
     emailPriorityOptions: [
       { text: 'Normal', value: 'normal' },
       { text: 'High', value: 'high' },
       { text: 'Low', value: 'low' },
     ],
-    formDisabled: false,
 
     showDeleteContextsExcelDialog: false,
     // TODO: show preview in modal
@@ -299,14 +290,9 @@ export default {
 
   watch: {
     // show validation message if bodyHtml is empty
-    bodyHtml: function (bodyHtml) {
-      if (bodyHtml == '') {
-        this.bodyHtmlErrors.push('Email Body is required');
-      }
-      else{
-        this.bodyHtmlErrors = [];
-      }
-    },
+    bodyHtml: function () {
+      this.validateHtmlBody();
+    }
   },
 
   methods: {
@@ -315,45 +301,46 @@ export default {
     // alert actions in vuex
     ...mapActions('alert', ['showAlert', 'clearAlert']),
 
+    // TODO: Show mail merge preview modal
     // ---- Preview ----
-    async loadPreview() {
-      // if form is valid
-      if (this.$refs.form.validate()) {
-        try {
-          // create new object with all fields
-          const formData = {
-            attachments: this.attachments,
-            bodyType: this.bodyType,
-            body: this.bodyType == 'text' ? this.bodyText : this.bodyHtml,
-            from: this.currentUserEmail,
-            subject: this.subject,
-            priority: this.priority,
-            contexts: Utils.getContextsObject(this.contexts),
-          };
-          // get preview data returned from CHES api
-          const { data } = await chesService.mergePreview(formData);
-          if (data && data.length > 0) {
-            // TODO: build 'mergePreviewData' data object here
-            // show in modal
-            // this.showPreviewDialog = true;
-          }
-        } catch (e) {
-          this.error = true;
-          // show error alert
-          this.showAlert({
-            type: 'error',
-            text: e,
-          });
-        }
-      } else {
-        // else form has validation error
-        window.scrollTo(0, 0);
-      }
-    },
+    // async loadPreview() {
+    //   // if form is valid
+    //   if (this.$refs.form.validate()) {
+    //     try {
+    //       // create new object with all fields
+    //       const formData = {
+    //         attachments: this.attachments,
+    //         bodyType: this.bodyType,
+    //         body: this.bodyType == 'text' ? this.bodyText : this.bodyHtml,
+    //         from: this.currentUserEmail,
+    //         subject: this.subject,
+    //         priority: this.priority,
+    //         contexts: Utils.getContextsObject(this.contexts),
+    //       };
+    //       // get preview data returned from CHES api
+    //       const { data } = await chesService.mergePreview(formData);
+    //       if (data && data.length > 0) {
+    //         // build 'mergePreviewData' data object here
+    //         // show in modal
+    //         // this.showPreviewDialog = true;
+    //       }
+    //     } catch (e) {
+    //       this.error = true;
+    //       // show error alert
+    //       this.showAlert({
+    //         type: 'error',
+    //         text: e,
+    //       });
+    //     }
+    //   } else {
+    //     // else form has validation error
+    //     window.scrollTo(0, 0);
+    //   }
+    // },
 
     // ---- Send Mail Merge ----
     async send() {
-      if (this.$refs.form.validate()) {
+      if (this.validateForm()) {
         try {
           // create new object with all fields
           const email = {
@@ -436,6 +423,22 @@ export default {
       };
       window.scrollTo(0, 0);
     },
+
+    validateHtmlBody(){
+      if (this.bodyType === 'html' && this.bodyHtml === '') {
+        this.bodyHtmlErrors = ['Email Body is required'];
+      }
+      else{
+        this.bodyHtmlErrors = [];
+      }
+    },
+
+    validateForm() {
+      this.validateHtmlBody();
+      if (this.$refs.form.validate() && this.bodyHtmlErrors.length < 1) {
+        return true;
+      }
+    },
   },
   mounted() {
     this.clearAlert();
@@ -453,7 +456,7 @@ export default {
 }
 /* inline labels */
 .flex-label {
-  width: 6rem;
+  width: 8rem;
   margin-top: 6px;
 }
 /* make radio buttons inline */
@@ -486,7 +489,9 @@ export default {
     display: none;
   }
   .v-tab {
-    padding: 0 3rem 0 0;
+    width: 9rem;
+
+    padding: 0;
     justify-content: start;
     text-transform: none;
     color: black;
@@ -502,5 +507,9 @@ export default {
       display: none;
     }
   }
+}
+/*invalid input field border */
+.errorBorder {
+  border: 1px solid red;
 }
 </style>

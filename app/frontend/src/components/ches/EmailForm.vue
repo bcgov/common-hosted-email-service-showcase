@@ -215,13 +215,13 @@
 
       <v-row justify="center" class="my-10">
         <v-col md="4">
-          <v-btn width="100%" large color="primary" @click="send()">
-            <span>Send</span>
+          <v-btn width="100%" large outlined @click="reloadForm">
+            <span>Cancel</span>
           </v-btn>
         </v-col>
         <v-col md="4">
-          <v-btn width="100%" large outlined @click="reloadForm">
-            <span>Cancel</span>
+          <v-btn width="100%" large color="primary" @click="send()">
+            <span>Send</span>
           </v-btn>
         </v-col>
       </v-row>
