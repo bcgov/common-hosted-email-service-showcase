@@ -40,8 +40,11 @@
           align="center"
           justify="center"
         >
-          <p class="pt-5">
+          <p class="pt-5 mb-1">
             Drag &amp; Drop your Excel file here, or click to Browse.
+          </p>
+          <p class="">
+            A sample Excel file containing contexts is available to download on the <router-link :to="{ name: 'MergeAbout'}" >About</router-link> tab.
           </p>
         </v-row>
       </v-container>

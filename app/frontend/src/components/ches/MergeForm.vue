@@ -44,7 +44,7 @@
         <!-- contextsType -->
         <v-col class="pb-0 col-md-8">
           <div class="d-flex">
-            <label class="flex-label">Contexts (optional)</label>
+            <label class="flex-label">Contexts</label>
             <v-radio-group
               v-model="contextsType"
               class="mt-0 ml-5 d-flex"
@@ -94,40 +94,28 @@
 
       <!-- Contexts -->
       <!-- Excel -->
-      <v-row v-if="contextsType === 'xlsx'">
+      <v-row v-show="contextsType === 'xlsx'">
         <v-col cols="12" md="12">
           <UploadContexts />
         </v-col>
       </v-row>
 
       <!-- JSON -->
-      <v-row v-if="contextsType === 'json'">
+      <v-row v-show="contextsType === 'json'">
         <v-col cols="12" md="12">
+          <!--
+          :class="bodyHtmlErrors.length > 0 ? 'errorBorder json-textarea' : 'json-textarea'"
+          -->
           <v-textarea
-            label="Contexts to insert into your mail merge template"
+            label="An array of message objects that each contain email recipient(s) and 'contexts' (eg: 'name') to insert into your mail merge template."
             v-model="contexts"
+            :rules="[(v) => !!v || 'A JSON array containing Contexts data is required']"
             class="json-textarea"
-            hint="Enter your context data in JSON format"
+            hint="Upload the sample Contexts files in Excel format found on the 'About' tab"
             outlined
             dense
           ></v-textarea>
-        </v-col>
-      </v-row>
 
-      <v-row>
-        <!-- body Type -->
-        <v-col cols="12" md="12" class="pb-0">
-          <div class="d-flex">
-            <label class="flex-label">Body Format</label>
-            <v-radio-group
-              v-model="bodyType"
-              class="mt-0 ml-5 d-flex"
-              hide-details="auto"
-            >
-              <v-radio class="" label="Plain Text" value="text"></v-radio>
-              <v-radio class="" label="HTML" value="html"></v-radio>
-            </v-radio-group>
-          </div>
         </v-col>
       </v-row>
 
@@ -139,12 +127,23 @@
             <v-tab v-if="contextVariables.length">Variables </v-tab>
 
             <v-tab-item>
+              <!-- body format -->
+              <div class="d-flex mt-1 mb-3">
+                <v-radio-group
+                  v-model="bodyType"
+                  class="mt-0 ml-2 d-flex"
+                  hide-details="auto"
+                >
+                  <v-radio class="" label="Plain Text" value="text"></v-radio>
+                  <v-radio class="" label="HTML" value="html"></v-radio>
+                </v-radio-group>
+              </div>
+
               <!-- text -->
               <v-textarea
                 v-if="bodyType === 'text'"
                 v-model="bodyText"
-                :rules="bodyRequiredRule"
-                hide-details="auto"
+                :rules="bodyTextRequiredRule"
                 outlined
                 dense
                 class="mb-3"
@@ -156,12 +155,12 @@
                   :value.sync="bodyHtml"
                   :class="bodyHtmlErrors.length > 0 ? 'errorBorder' : ''"
                 ></Ckeditor>
-                <VMessages :value="bodyHtmlErrors" color="error" />
+                <VMessages :value="bodyHtmlErrors" color="error" class="ma-2" />
               </div>
             </v-tab-item>
 
             <v-tab-item>
-              <v-simple-table dense class="contexts-table">
+              <v-simple-table dense class="contexts-table mt-2">
                 <template v-slot:default>
                   <tbody>
                     <tr
@@ -182,7 +181,7 @@
 
       <v-row>
         <!-- Attachments -->
-        <v-col cols="12" md="12">
+        <v-col cols="12" md="12" class="pt-0">
           <label>Attachments (optional)</label>
           <Upload
             @filesUploaded="processAttachments($event)"
@@ -194,14 +193,18 @@
 
       <v-row justify="center" class="my-10">
         <!-- cancel button -->
-        <v-col md="6">
+        <v-col md="4">
           <v-btn width="100%" large outlined @click="reloadForm">
             <span>Cancel</span>
           </v-btn>
         </v-col>
         <!-- preview button -->
-        <!-- <v-col md="4">
-          <v-btn width="100%" large outlined @click="loadPreview()">
+        <v-col md="4">
+          <v-btn
+            width="100%"
+            large
+            outlined
+            @click="loadPreview()">
             <span>Preview</span>
           </v-btn>
           <MergePreviewDialog
@@ -209,9 +212,9 @@
             @close-dialog="showPreviewDialog = false"
           >
           </MergePreviewDialog>
-        </v-col> -->
+        </v-col>
         <!-- Send button -->
-        <v-col md="6">
+        <v-col md="4">
           <v-btn width="100%" large color="primary" @click="send()">
             <span>Send</span>
           </v-btn>
@@ -232,7 +235,7 @@ import * as Utils from '@/utils/utils';
 import Upload from '@/components/ches/Upload';
 import UploadContexts from '@/components/ches/UploadContexts';
 import Ckeditor from '@/components/ches/Ckeditor';
-// import MergePreviewDialog from '@/components/ches/MergePreviewDialog';
+import MergePreviewDialog from '@/components/ches/MergePreviewDialog';
 
 export default {
   name: 'MergeForm',
@@ -240,12 +243,10 @@ export default {
     Upload,
     UploadContexts,
     Ckeditor,
-    // MergePreviewDialog,
+    MergePreviewDialog,
   },
 
   data: () => ({
-
-    bodyHtmlErrors: [],
 
     emailPriorityOptions: [
       { text: 'Normal', value: 'normal' },
@@ -254,11 +255,11 @@ export default {
     ],
 
     showDeleteContextsExcelDialog: false,
-    // TODO: show preview in modal
-    // showPreviewDialog: false,
+    showPreviewDialog: false,
 
     // validation
-    bodyRequiredRule: [(v) => !!v || 'Email Body is required'],
+    bodyTextRequiredRule: [(v) => !!v || 'Email Body is required'],
+    bodyHtmlErrors: [],
   }),
 
   computed: {
@@ -278,8 +279,8 @@ export default {
       'mergeForm.contextVariables',
       'mergeForm',
 
-      // TODO: add preview data to store
-      // 'mergePreview',
+      // mergePreview data
+      'mergePreview',
     ]),
 
     // get current users email from vuex
@@ -303,40 +304,42 @@ export default {
 
     // TODO: Show mail merge preview modal
     // ---- Preview ----
-    // async loadPreview() {
-    //   // if form is valid
-    //   if (this.$refs.form.validate()) {
-    //     try {
-    //       // create new object with all fields
-    //       const formData = {
-    //         attachments: this.attachments,
-    //         bodyType: this.bodyType,
-    //         body: this.bodyType == 'text' ? this.bodyText : this.bodyHtml,
-    //         from: this.currentUserEmail,
-    //         subject: this.subject,
-    //         priority: this.priority,
-    //         contexts: Utils.getContextsObject(this.contexts),
-    //       };
-    //       // get preview data returned from CHES api
-    //       const { data } = await chesService.mergePreview(formData);
-    //       if (data && data.length > 0) {
-    //         // build 'mergePreviewData' data object here
-    //         // show in modal
-    //         // this.showPreviewDialog = true;
-    //       }
-    //     } catch (e) {
-    //       this.error = true;
-    //       // show error alert
-    //       this.showAlert({
-    //         type: 'error',
-    //         text: e,
-    //       });
-    //     }
-    //   } else {
-    //     // else form has validation error
-    //     window.scrollTo(0, 0);
-    //   }
-    // },
+    async loadPreview() {
+      // if form is valid
+      if (this.validateForm()) {
+        try {
+          // create new object with all fields
+          const formData = {
+            attachments: this.attachments,
+            bodyType: this.bodyType,
+            body: this.bodyType == 'text' ? this.bodyText : this.bodyHtml,
+            from: this.currentUserEmail,
+            subject: this.subject,
+            priority: this.priority,
+            contexts: Utils.getContextsObject(this.contexts),
+          };
+          // get preview data returned from CHES api
+          const { data } = await chesService.mergePreview(formData);
+          if (data && data.length > 0) {
+            // build 'mergePreview' data object here
+            this.mergePreview = data;
+            // show in modal
+            this.showPreviewDialog = true;
+          }
+        } catch (e) {
+          this.error = true;
+          // show error alert
+          this.showAlert({
+            type: 'error',
+            text: e,
+          });
+        }
+      }
+      // else form has validation error
+      else {
+        this.scrollToError();
+      }
+    },
 
     // ---- Send Mail Merge ----
     async send() {
@@ -372,9 +375,10 @@ export default {
             text: e,
           });
         }
-      } else {
-        // else form has validation error
-        window.scrollTo(0, 0);
+      }
+      // else form has validation error
+      else {
+        this.scrollToError();
       }
     },
 
@@ -399,6 +403,8 @@ export default {
     // reset form
     reloadForm() {
       this.$refs.form.resetValidation();
+      this.bodyHtmlErrors = [];
+
       // reset store:
       this.mergeForm = {
         ...this.mergeForm,
@@ -424,20 +430,37 @@ export default {
       window.scrollTo(0, 0);
     },
 
+    async scrollToError(){
+      await new Promise((r) => setTimeout(r, 50));
+      const el = document.querySelector(
+        '.v-messages.error--text:first-of-type'
+      );
+      el.scrollIntoView(true);
+      window.scrollBy(0, -80);
+    },
+
     validateHtmlBody(){
       if (this.bodyType === 'html' && this.bodyHtml === '') {
         this.bodyHtmlErrors = ['Email Body is required'];
+        return false;
       }
       else{
         this.bodyHtmlErrors = [];
+        return true;
       }
     },
 
     validateForm() {
-      this.validateHtmlBody();
-      if (this.$refs.form.validate() && this.bodyHtmlErrors.length < 1) {
+      // make JSON contexts element visible to show error if empty
+      if(this.contexts == '') this.contextsType = 'json';
+
+      // if vuetify rules pass
+      if (this.$refs.form.validate()
+      // and bodyHtml is valid
+        && this.validateHtmlBody()) {
         return true;
       }
+      return false;
     },
   },
   mounted() {
@@ -456,7 +479,7 @@ export default {
 }
 /* inline labels */
 .flex-label {
-  width: 8rem;
+  width: 7rem;
   margin-top: 6px;
 }
 /* make radio buttons inline */
@@ -481,15 +504,19 @@ export default {
 }
 /* give wysiwyg editor a min height */
 .bodyDiv ::v-deep .ck-editor__editable {
-  min-height: 180px;
+  min-height: 125px;
 }
 /* un-style variables/body tabs */
 .merge-tabs ::v-deep {
   .v-tabs-slider-wrapper {
     display: none;
   }
+  .v-tabs-bar{
+    margin-right: 1rem;
+  }
   .v-tab {
-    width: 9rem;
+    width: 7rem;
+    border-bottom: 2px solid gray;
 
     padding: 0;
     justify-content: start;

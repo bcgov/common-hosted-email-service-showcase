@@ -24,6 +24,8 @@ import BoldPlugin from '@ckeditor/ckeditor5-basic-styles/src/bold';
 import ItalicPlugin from '@ckeditor/ckeditor5-basic-styles/src/italic';
 import LinkPlugin from '@ckeditor/ckeditor5-link/src/link';
 import ParagraphPlugin from '@ckeditor/ckeditor5-paragraph/src/paragraph';
+// TODO: add Table plugins so we can use tables in template html
+// see: https://ckeditor.com/docs/ckeditor5/latest/features/table.html#table-and-cell-styling-tools-2
 
 export default {
   name: 'Ckeditor',
@@ -48,8 +50,8 @@ export default {
         SourceEditingPlugin,
       ],
       toolbar: {
-        items: ['bold', 'italic', '|', 'undo', 'redo', '|', 'sourceEditing'],
-      },
+        items: ['italic', 'bold', '|', 'undo', 'redo', '|', 'sourceEditing'],
+      }
     },
   }),
 
