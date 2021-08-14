@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <MergeForm />
-  </div>
+  <MergeForm />
 </template>
 
 <script>

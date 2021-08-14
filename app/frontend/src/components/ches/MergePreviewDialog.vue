@@ -22,7 +22,7 @@
                   readonly
                   outlined
                   dense
-                ></v-text-field>
+                />
               </v-col>
 
               <v-col cols="12" md="6">
@@ -33,7 +33,7 @@
                   readonly
                   outlined
                   dense
-                ></v-text-field>
+                />
               </v-col>
             </v-row>
 
@@ -46,7 +46,7 @@
                   readonly
                   outlined
                   dense
-                ></v-text-field>
+                />
               </v-col>
 
               <v-col cols="12" md="6">
@@ -57,7 +57,7 @@
                   readonly
                   outlined
                   dense
-                ></v-text-field>
+                />
               </v-col>
             </v-row>
 
@@ -70,7 +70,7 @@
                   outlined
                   readonly
                   dense
-                ></v-text-field>
+                />
               </v-col>
             </v-row>
 
@@ -84,7 +84,8 @@
                   readonly
                   outlined
                   dense
-                ></v-textarea>
+                  auto-grow
+                />
                 <div
                   v-else
                   class="bodyPreviewDiv"
@@ -93,29 +94,28 @@
               </v-col>
             </v-row>
 
-            <v-row v-if="mergePreview[mergePreviewIndex].attachments.lenghth > 0">
+            <v-row
+              v-if="mergePreview[mergePreviewIndex].attachments.lenghth > 0"
+            >
               <v-col cols="12" md="12">
                 <label>Attachments</label>
                 <ul>
-                  <li v-for="item in mergePreview[mergePreviewIndex].attachments" :key="item.filename">
+                  <li
+                    v-for="item in mergePreview[mergePreviewIndex].attachments"
+                    :key="item.filename"
+                  >
                     {{ item.filename }}
                   </li>
                 </ul>
               </v-col>
             </v-row>
-
           </v-container>
         </v-card-text>
       </div>
       <v-card-actions class="pb-10 justify-center">
-        <v-btn
-          color="primary"
-          @click="previewPrevious()"
-          :disabled="previousDisabled"
-        >
+        <v-btn color="primary" @click="previewPrevious()" :disabled="previousDisabled">
           <span>Previous</span>
         </v-btn>
-
         <v-btn color="primary" @click="previewNext()" :disabled="nextDisabled">
           <span>Next</span>
         </v-btn>
@@ -142,15 +142,14 @@ export default {
   }),
 
   computed: {
-    // get form data from vuex
     ...mapFields('ches', ['mergePreview']),
 
-    previousDisabled: function () {
-      return this.mergePreviewIndex === 0;
+    nextDisabled() {
+      return this.mergePreviewIndex === this.mergePreview.length - 1;
     },
 
-    nextDisabled: function () {
-      return this.mergePreviewIndex === this.mergePreview.length - 1;
+    previousDisabled() {
+      return this.mergePreviewIndex === 0;
     },
 
   },
@@ -160,7 +159,7 @@ export default {
       this.$emit('close-dialog');
     },
 
-    formatAsList: function (arr) {
+    formatAsList(arr) {
       return arr.join(', ');
     },
 
@@ -172,6 +171,7 @@ export default {
       this.mergePreviewIndex++;
     },
   },
+
 };
 </script>
 
@@ -181,5 +181,6 @@ export default {
   border-radius: 4px;
   padding: 12px;
   font-size: 16px;
+  overflow: auto;
 }
 </style>

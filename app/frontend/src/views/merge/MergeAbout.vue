@@ -23,16 +23,15 @@
 
           <ul class="mb-4">
             <li>
-              <a href="/docs/mssc-ches-merge-example.csv" download="mssc-ches-merge-example-csv.csv">example csv</a>
+              <a :href="`${publicPath}examples/mssc-ches-merge-example.csv`" download="mssc-ches-merge-example-csv.csv">example csv</a>
             </li>
             <li>
-              <a href="/docs/mssc-ches-merge-example.xlsx" download="mssc-ches-merge-example-excel.xlsx">example xlsx</a>
+              <a :href="`${publicPath}examples/mssc-ches-merge-example.xlsx`" download="mssc-ches-merge-example-excel.xlsx">example xlsx</a>
             </li>
             <li>
-              <a href="/docs/mssc-ches-merge-example.txt" download="mssc-ches-merge-example-template.txt">example html template</a>
+              <a :href="`${publicPath}examples/mssc-ches-merge-example.txt`" download="mssc-ches-merge-example-template.txt">example html template</a>
             </li>
           </ul>
-
           <h4 class="my-2">Guide</h4>
           <ol class="mb-4">
             <li>Download the two examples.</li>
@@ -42,7 +41,7 @@
             <li>For the body, click the HTML button to bring up the editor, then click View, click Source Code.
             </li>
             <li>Paste the contents of the example html template into the Source Code view and Save.</li>
-            <li>For the Subject, enter <span v-pre>&quot;ATTN&#58; &#123;&#123;scope&#125;&#125;&#33;&quot;</span></li>
+            <li>For the Subject, enter &quot;ATTN&#58; &#123;&#123;scope&#125;&#125;&#33;&quot;</li>
             <li>Click Preview</li>
           </ol>
 
@@ -90,6 +89,10 @@
 <script>
 export default {
   name: 'MergeAbout',
-  components: {},
+  data () {
+    return {
+      publicPath: process.env.BASE_URL
+    };
+  }
 };
 </script>

@@ -102,16 +102,7 @@ export default {
 
       const file = e.dataTransfer.file;
       // validate Excel file
-      if (!this.validateFile(file)) {
-        // show error alert
-        this.alert = {
-          type: 'warning',
-          text: 'Context file size cannot excede 20MB',
-        };
-        this.showAlert(this.alert);
-      }
-      // else attachments are valid
-      else {
+      if (this.validateFile(file)) {
         // parse file
         this.parseFile(file, this.addContextsToStore);
         // make file data avalable in parent component
@@ -120,6 +111,15 @@ export default {
         this.excelParsed = true;
 
         this.clearAlert();
+      }
+      // else attachments are valid
+      else {
+        // show error alert
+        this.alert = {
+          type: 'warning',
+          text: 'Context file size cannot excede 20MB',
+        };
+        this.showAlert(this.alert);
       }
     },
 
@@ -131,14 +131,13 @@ export default {
       };
 
       const reader = new FileReader();
-      const rABS = !!reader.readAsBinaryString;
 
       reader.onload = (e) => {
         /* Parse data */
         const bstr = e.target.result;
 
         const wb = XLSX.read(bstr, {
-          type: rABS ? 'binary' : 'array',
+          type: reader.readAsBinaryString ? 'binary' : 'array',
           cellDates: true,
           dateNF: Formats.EXCEL_PARSE_FORMAT,
         });
@@ -148,7 +147,7 @@ export default {
         /* Convert array of arrays */
         const data = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false });
 
-        let excel = { cols: [], headers: [], data: [] };
+        const excel = { cols: [], headers: [], data: [] };
         excel.cols = this.make_cols(ws['!ref']);
 
         const headers = this.sanitizeHeaders(data[0]);
@@ -158,8 +157,8 @@ export default {
 
         let contexts = [];
 
-        excel.data.forEach((d) => {
-          let r = {
+        excel.data.forEach((element) => {
+          let message = {
             to: [],
             cc: [],
             bcc: [],
@@ -168,36 +167,35 @@ export default {
             delayTSDisplay: undefined,
             context: {},
           };
-          let fields = excel.cols;
-          fields.forEach((f) => {
-            let fieldName = excel.headers[0][f.key];
+          excel.cols.forEach((col) => {
+            let fieldName = excel.headers[0][col.key];
             switch (fieldName.toLowerCase()) {
               case 'to':
-                r.to = Utils.getAddresses(d[f.key]);
+                message.to = Utils.getAddresses(element[col.key]);
                 break;
               case 'cc':
-                r.cc = Utils.getAddresses(d[f.key]);
+                message.cc = Utils.getAddresses(element[col.key]);
                 break;
               case 'bcc':
-                r.bcc = Utils.getAddresses(d[f.key]);
+                message.bcc = Utils.getAddresses(element[col.key]);
                 break;
               case 'tag':
-                r.tag = d[f.key];
+                message.tag = element[col.key];
                 break;
               case 'delayts':
-                r.delayTS = this.parseDelayTs(d[f.key]);
+                message.delayTS = this.parseDelayTs(element[col.key]);
                 // for display in the table, format it nicely (not unix milliseconds...)
-                d[f.key] = r.delayTS
-                  ? moment(d[f.key]).format(Formats.CONTEXTS_TS_FORMAT)
+                element[col.key] = message.delayTS
+                  ? moment(element[col.key]).format(Formats.CONTEXTS_TS_FORMAT)
                   : undefined;
                 break;
               default:
-                this.handleDefault(r.context, d, fieldName, f.key);
+                this.handleDefault(message.context, element, fieldName, col.key);
                 // for display in the table, return the value from the context (altered for date or timestamp)
-                d[f.key] = r.context[fieldName];
+                element[col.key] = message.context[fieldName];
             }
           });
-          if (this.validateContext(r)) contexts.push(r);
+          if (this.validateContext(message)) contexts.push(message);
         });
 
         let formContexts = JSON.stringify(contexts, null, 2);
@@ -210,7 +208,7 @@ export default {
         });
       };
 
-      if (rABS) reader.readAsBinaryString(file);
+      if (reader.readAsBinaryString) reader.readAsBinaryString(file);
       else reader.readAsArrayBuffer(file);
     },
 
@@ -241,21 +239,23 @@ export default {
     },
 
     makeHeaderUnique(existing, original, val = original, count = 0) {
-      if ('' === original) {
-        original = val = 'var';
+      let value = original;
+      if (original === '') {
+        value = 'val';
       }
       if (existing.includes(val)) {
         count++;
         return this.makeHeaderUnique(
           existing,
-          original,
-          `${original}${count}`,
+          value,
+          `${value}${count}`,
           count
         );
       } else {
-        return val;
+        return value;
       }
     },
+
     // turn contexts into nunjucks variables
     contextsToVariables(contexts) {
       let result = [];

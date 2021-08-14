@@ -10,7 +10,5 @@ export default {
   components: {
     HistoryTable
   },
-  data: () => ({
-  }),
 };
 </script>

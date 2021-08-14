@@ -1,3 +1,10 @@
+// ----------- ckeditor config ----
+// see: https://ckeditor.com/docs/ckeditor5/latest/builds/guides/integration/frameworks/vuejs-v2.html#configuring-vueconfigjs
+const path = require('path');
+const CKEditorWebpackPlugin = require('@ckeditor/ckeditor5-dev-webpack-plugin');
+const { styles } = require('@ckeditor/ckeditor5-dev-utils');
+// ----
+
 process.env.VUE_APP_VERSION = require('./package.json').version;
 
 const proxyObject = {
@@ -5,14 +12,6 @@ const proxyObject = {
   ws: true,
   changeOrigin: true
 };
-
-
-// ----------- ckeditor config ----
-// see: https://ckeditor.com/docs/ckeditor5/latest/builds/guides/integration/frameworks/vuejs-v2.html#configuring-vueconfigjs
-const path = require('path');
-const CKEditorWebpackPlugin = require('@ckeditor/ckeditor5-dev-webpack-plugin');
-const { styles } = require('@ckeditor/ckeditor5-dev-utils');
-// ----
 
 module.exports = {
   publicPath: process.env.FRONTEND_BASEPATH ? process.env.FRONTEND_BASEPATH : '/app',

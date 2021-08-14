@@ -11,7 +11,7 @@
             readonly
             outlined
             dense
-          ></v-text-field>
+          />
         </v-col>
         <!-- priority -->
         <v-col cols="12" md="6">
@@ -24,7 +24,7 @@
             hide-details="auto"
             outlined
             dense
-          ></v-select>
+          />
         </v-col>
       </v-row>
       <v-row>
@@ -37,7 +37,7 @@
             hide-details="auto"
             outlined
             dense
-          ></v-text-field>
+          />
         </v-col>
       </v-row>
       <v-row>
@@ -109,29 +109,31 @@
           <v-textarea
             label="An array of message objects that each contain email recipient(s) and 'contexts' (eg: 'name') to insert into your mail merge template."
             v-model="contexts"
-            :rules="[(v) => !!v || 'A JSON array containing Contexts data is required']"
+            :rules="[
+              (v) => !!v || 'A JSON array containing Contexts data is required',
+            ]"
             class="json-textarea"
             hint="Upload the sample Contexts files in Excel format found on the 'About' tab"
             outlined
+            rows="8"
             dense
-          ></v-textarea>
-
+          />
         </v-col>
       </v-row>
 
       <v-row>
         <!-- body -->
         <v-col cols="12" md="12">
-          <v-tabs vertical class="merge-tabs">
+          <v-tabs vertical class="merge-tabs pt-0">
             <v-tab> Body</v-tab>
-            <v-tab v-if="contextVariables.length">Variables </v-tab>
+            <v-tab v-show="contextVariables.length">Variables </v-tab>
 
             <v-tab-item>
               <!-- body format -->
               <div class="d-flex mt-1 mb-3">
                 <v-radio-group
                   v-model="bodyType"
-                  class="mt-0 ml-2 d-flex"
+                  class="mt-1 ml-2 d-flex"
                   hide-details="auto"
                 >
                   <v-radio class="" label="Plain Text" value="text"></v-radio>
@@ -146,15 +148,16 @@
                 :rules="bodyTextRequiredRule"
                 outlined
                 dense
+                rows="8"
                 class="mb-3"
-              ></v-textarea>
+              />
               <!-- html -->
-              <div v-else>
+              <div v-else class="bodyDiv">
                 <Ckeditor
                   v-model="bodyHtml"
                   :value.sync="bodyHtml"
                   :class="bodyHtmlErrors.length > 0 ? 'errorBorder' : ''"
-                ></Ckeditor>
+                />
                 <VMessages :value="bodyHtmlErrors" color="error" class="ma-2" />
               </div>
             </v-tab-item>
@@ -200,18 +203,13 @@
         </v-col>
         <!-- preview button -->
         <v-col md="4">
-          <v-btn
-            width="100%"
-            large
-            outlined
-            @click="loadPreview()">
+          <v-btn width="100%" large outlined @click="loadPreview()">
             <span>Preview</span>
           </v-btn>
           <MergePreviewDialog
             :show="showPreviewDialog"
             @close-dialog="showPreviewDialog = false"
-          >
-          </MergePreviewDialog>
+          />
         </v-col>
         <!-- Send button -->
         <v-col md="4">
@@ -247,7 +245,6 @@ export default {
   },
 
   data: () => ({
-
     emailPriorityOptions: [
       { text: 'Normal', value: 'normal' },
       { text: 'High', value: 'high' },
@@ -293,7 +290,7 @@ export default {
     // show validation message if bodyHtml is empty
     bodyHtml: function () {
       this.validateHtmlBody();
-    }
+    },
   },
 
   methods: {
@@ -430,7 +427,7 @@ export default {
       window.scrollTo(0, 0);
     },
 
-    async scrollToError(){
+    async scrollToError() {
       await new Promise((r) => setTimeout(r, 50));
       const el = document.querySelector(
         '.v-messages.error--text:first-of-type'
@@ -439,12 +436,11 @@ export default {
       window.scrollBy(0, -80);
     },
 
-    validateHtmlBody(){
+    validateHtmlBody() {
       if (this.bodyType === 'html' && this.bodyHtml === '') {
         this.bodyHtmlErrors = ['Email Body is required'];
         return false;
-      }
-      else{
+      } else {
         this.bodyHtmlErrors = [];
         return true;
       }
@@ -452,12 +448,14 @@ export default {
 
     validateForm() {
       // make JSON contexts element visible to show error if empty
-      if(this.contexts == '') this.contextsType = 'json';
+      if (this.contexts == '') this.contextsType = 'json';
 
       // if vuetify rules pass
-      if (this.$refs.form.validate()
-      // and bodyHtml is valid
-        && this.validateHtmlBody()) {
+      if (
+        this.$refs.form.validate() &&
+        // and bodyHtml is valid
+        this.validateHtmlBody()
+      ) {
         return true;
       }
       return false;
@@ -479,7 +477,7 @@ export default {
 }
 /* inline labels */
 .flex-label {
-  width: 7rem;
+  width: 6rem;
   margin-top: 6px;
 }
 /* make radio buttons inline */
@@ -504,20 +502,18 @@ export default {
 }
 /* give wysiwyg editor a min height */
 .bodyDiv ::v-deep .ck-editor__editable {
-  min-height: 125px;
+  min-height: 210px;
 }
 /* un-style variables/body tabs */
 .merge-tabs ::v-deep {
   .v-tabs-slider-wrapper {
     display: none;
   }
-  .v-tabs-bar{
+  .v-tabs-bar {
     margin-right: 1rem;
   }
   .v-tab {
-    width: 7rem;
-    border-bottom: 2px solid gray;
-
+    width: 6rem;
     padding: 0;
     justify-content: start;
     text-transform: none;
@@ -532,6 +528,9 @@ export default {
     }
     & > span {
       display: none;
+    }
+    &:last-child {
+      border-top: 2px solid gray;
     }
   }
 }

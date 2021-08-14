@@ -111,7 +111,7 @@ export default {
 
     humanDateTime(timestamp){
       // date-fns docs: https://date-fns.org/v2.21.1/docs/Getting-Started
-      return (timestamp === 0 || !timestamp) ? '-' : format(new Date(timestamp), 'yyyy-MM-dd HH:mm');
+      return timestamp ? format(new Date(timestamp), 'yyyy-MM-dd HH:mm') : '-';
     }
   },
 
