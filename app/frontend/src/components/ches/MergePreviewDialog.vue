@@ -17,7 +17,7 @@
               <v-col cols="12" md="6">
                 <label>Sender</label>
                 <v-text-field
-                  v-model="mergePreview[mergePreviewIndex].from"
+                  v-model="message.from"
                   hide-details="auto"
                   readonly
                   outlined
@@ -28,7 +28,7 @@
               <v-col cols="12" md="6">
                 <label>Recipients</label>
                 <v-text-field
-                  :value="formatAsList(mergePreview[mergePreviewIndex].to)"
+                  :value="formatAsList(message.to)"
                   hide-details="auto"
                   readonly
                   outlined
@@ -41,7 +41,7 @@
               <v-col cols="12" md="6">
                 <label>CC</label>
                 <v-text-field
-                  :value="formatAsList(mergePreview[mergePreviewIndex].cc)"
+                  :value="formatAsList(message.cc)"
                   hide-details="auto"
                   readonly
                   outlined
@@ -52,7 +52,7 @@
               <v-col cols="12" md="6">
                 <label>BCC</label>
                 <v-text-field
-                  :value="formatAsList(mergePreview[mergePreviewIndex].bcc)"
+                  :value="formatAsList(message.bcc)"
                   hide-details="auto"
                   readonly
                   outlined
@@ -65,7 +65,7 @@
               <v-col cols="12" md="12">
                 <label>Subject</label>
                 <v-text-field
-                  v-model="mergePreview[mergePreviewIndex].subject"
+                  v-model="message.subject"
                   hide-details="auto"
                   outlined
                   readonly
@@ -78,32 +78,23 @@
               <v-col cols="12" md="12">
                 <label>Body</label>
                 <v-textarea
-                  v-if="mergePreview[mergePreviewIndex].bodyType === 'text'"
-                  v-model="mergePreview[mergePreviewIndex].body"
+                  v-if="message.bodyType === 'text'"
+                  v-model="message.body"
                   hide-details="auto"
                   readonly
                   outlined
                   dense
                   auto-grow
                 />
-                <div
-                  v-else
-                  class="bodyPreviewDiv"
-                  v-html="mergePreview[mergePreviewIndex].body"
-                ></div>
+                <div v-else class="bodyPreviewDiv" v-html="message.body"></div>
               </v-col>
             </v-row>
 
-            <v-row
-              v-if="mergePreview[mergePreviewIndex].attachments.lenghth > 0"
-            >
+            <v-row v-if="message.attachments.lenghth > 0">
               <v-col cols="12" md="12">
                 <label>Attachments</label>
                 <ul>
-                  <li
-                    v-for="item in mergePreview[mergePreviewIndex].attachments"
-                    :key="item.filename"
-                  >
+                  <li v-for="item in message.attachments" :key="item.filename">
                     {{ item.filename }}
                   </li>
                 </ul>
@@ -113,10 +104,18 @@
         </v-card-text>
       </div>
       <v-card-actions class="pb-10 justify-center">
-        <v-btn color="primary" @click="previewPrevious()" :disabled="previousDisabled">
+        <v-btn
+          color="primary"
+          @click="previewPrevious()"
+          :disabled="previousDisabled"
+        >
           <span>Previous</span>
         </v-btn>
-        <v-btn color="primary" @click="previewNext()" :disabled="nextDisabled">
+        <v-btn
+          color="primary"
+          @click="previewNext()"
+          :disabled="nextDisabled"
+        >
           <span>Next</span>
         </v-btn>
       </v-card-actions>
@@ -144,6 +143,21 @@ export default {
   computed: {
     ...mapFields('ches', ['mergePreview']),
 
+    message() {
+      return this.mergePreview.length
+        ? this.mergePreview[this.mergePreviewIndex]
+        : {
+          from: '',
+          to: [],
+          bcc: [],
+          cc: [],
+          subject: '',
+          bodyType: '',
+          bpsy: '',
+          attachments: [],
+        };
+    },
+
     nextDisabled() {
       return this.mergePreviewIndex === this.mergePreview.length - 1;
     },
@@ -151,7 +165,6 @@ export default {
     previousDisabled() {
       return this.mergePreviewIndex === 0;
     },
-
   },
 
   methods: {
@@ -171,7 +184,6 @@ export default {
       this.mergePreviewIndex++;
     },
   },
-
 };
 </script>
 

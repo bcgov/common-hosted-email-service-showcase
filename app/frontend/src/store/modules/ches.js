@@ -33,22 +33,7 @@ export default {
       contextVariables: [],
     },
 
-    // merge preview
-    mergePreview: {
-      attachments: [],
-      data: [],
-      index: -1,
-      length: -1,
-      email: {
-        bodyType: '',
-        body: '',
-        from: '',
-        subject: '',
-        bcc: [],
-        cc: [],
-        to: []
-      }
-    },
+    mergePreview: [],
     // eof merge form
 
   },

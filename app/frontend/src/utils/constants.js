@@ -27,13 +27,13 @@ export const Regex = Object.freeze({
 });
 
 // export const Roles = Object.freeze({
-//   SENDER_EDITOR_ROLE: 'mssc:sender_editor',
-//   DEFAULT_SENDER: 'NR.CommonServiceShowcase@gov.bc.ca'
+//   SENDER_EDITOR_ROLE: '',
+//   DEFAULT_SENDER: ''
 // });
 
 export const Formats = Object.freeze({
-  CONTEXTS_DT_FORMAT: 'YYYY-MM-DD',
-  CONTEXTS_TS_FORMAT: 'YYYY-MM-DD HH:mm',
+  CONTEXTS_DT_FORMAT: 'yyyy-MM-dd',
+  CONTEXTS_TS_FORMAT: 'yyyy-MM-dd HH:mm',
   EXCEL_PARSE_FORMAT: 'm/d/yy h:mm',
-  MOMENT_PARSE_FORMAT: 'M/D/YY HH:mm',
+  TEST_DT_FORMAT: 'M/d/yy HH:mm',
 });

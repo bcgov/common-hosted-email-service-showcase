@@ -7,14 +7,14 @@
             <th
               v-for="header in excel.headers[0]"
               :key="header"
-              class="text-left"
+              class="text-left pa-2"
             >
               {{ header }}
             </th>
           </thead>
           <tbody>
             <tr v-for="row in excel.data" :key="excel.data.indexOf(row)">
-              <td v-for="val in row" :key="val" class="text-left truncate pl-0">
+              <td v-for="val in row" :key="val" class="text-left truncate pa-2">
                 {{ val }}
               </td>
             </tr>
@@ -68,7 +68,8 @@
  */
 
 import XLSX from 'xlsx';
-import moment from 'moment';
+import { format, parse, isValid } from 'date-fns';
+
 import { mapActions } from 'vuex';
 import { mapFields } from 'vuex-map-fields';
 
@@ -124,12 +125,6 @@ export default {
     },
 
     parseFile(file, cb) {
-      // this will suppress a console warning about moment deprecating a default fallback on non ISO/RFC2822 date formats
-      // we will just force it to use the new Date constructor.
-      moment.createFromInputFallback = function (config) {
-        config._d = new Date(config._i);
-      };
-
       const reader = new FileReader();
 
       reader.onload = (e) => {
@@ -156,7 +151,6 @@ export default {
         excel.data = data.slice(1);
 
         let contexts = [];
-
         excel.data.forEach((element) => {
           let message = {
             to: [],
@@ -186,7 +180,7 @@ export default {
                 message.delayTS = this.parseDelayTs(element[col.key]);
                 // for display in the table, format it nicely (not unix milliseconds...)
                 element[col.key] = message.delayTS
-                  ? moment(element[col.key]).format(Formats.CONTEXTS_TS_FORMAT)
+                  ? format( parse(element[col.key], Formats.TEST_DT_FORMAT, new Date()), Formats.CONTEXTS_TS_FORMAT)
                   : undefined;
                 break;
               default:
@@ -275,49 +269,34 @@ export default {
       return result;
     },
 
+    // process as a custom context unless field looks like a date or timestamp */
     handleDefault(context, data, fieldName, key) {
       const value = data[key];
-      // use relaxed mode to determine if date (would fail with 0:00 on strict)
-      const isDate =
-        moment(value, Formats.MOMENT_PARSE_FORMAT).format() !== 'Invalid date';
-      // be strict when determining if timestamp - we want valid h:mm
-      const isTimestamp =
-        moment(value, Formats.MOMENT_PARSE_FORMAT, true).format() !==
-        'Invalid date';
-      const isTimestampField =
-        isTimestamp && fieldName.toLowerCase().endsWith('ts');
-      if (isTimestampField) {
-        const ts = moment(value);
+      const isDate = isValid(parse(value, Formats.TEST_DT_FORMAT, new Date()));
+      const isTimestamp = isValid(parse(value, Formats.TEST_DT_FORMAT, new Date())) && fieldName.toLowerCase().endsWith('ts');
+      const dateObj = parse(value, Formats.TEST_DT_FORMAT, new Date());
+      if (isTimestamp) {
         context[fieldName] =
-          ts.format(Formats.CONTEXTS_TS_FORMAT) !== 'Invalid date'
-            ? ts.format(Formats.CONTEXTS_TS_FORMAT)
+          format(dateObj, Formats.CONTEXTS_TS_FORMAT) !== 'Invalid Date'
+            ? format(dateObj, Formats.CONTEXTS_TS_FORMAT)
             : value;
-      } else if (isDate) {
-        const dt = moment(value);
+      }
+      else if (isDate) {
         context[fieldName] =
-          dt.format(Formats.CONTEXTS_DT_FORMAT) !== 'Invalid date'
-            ? dt.format(Formats.CONTEXTS_DT_FORMAT)
+          format(dateObj, Formats.CONTEXTS_DT_FORMAT) !== 'Invalid Date'
+            ? format(dateObj, Formats.CONTEXTS_DT_FORMAT)
             : value;
-      } else {
+      }
+      else {
         context[fieldName] = value;
       }
     },
 
     parseDelayTs(value) {
-      // eslint-disable-next-line no-console
-      console.log(
-        `parseDelayTs value=${value}, isTimestamp? ${moment(
-          value,
-          Formats.MOMENT_PARSE_FORMAT,
-          true
-        ).format()}`
-      );
-      if (
-        moment(value, Formats.MOMENT_PARSE_FORMAT, true).format() !==
-        'Invalid date'
-      ) {
+      const dateObj = parse(value, Formats.TEST_DT_FORMAT, new Date());
+      if (isValid(dateObj, Formats.TEST_DT_FORMAT, true)) {
         //return the utc integer value of the timestamp
-        return moment(value).utc().valueOf();
+        return dateObj.getTime();
       }
       // no good, return undefined so API doesn't process it.
       return undefined;
@@ -365,21 +344,23 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .drop-zone {
   border: 3px dashed #606060;
   border-radius: 0.5rem;
 }
 .truncate {
-  max-width: 1px;
+  max-width: 300px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 /* style excel stuff */
 .contexts-table{
+  display: flex;
   border: 1px solid grey;
-  padding: 10px;
+  thead {
+    background: rgb(211, 211, 211);
+  }
 }
-
 </style>
