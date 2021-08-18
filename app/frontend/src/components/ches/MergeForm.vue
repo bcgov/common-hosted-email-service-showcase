@@ -107,11 +107,10 @@
           :class="bodyHtmlErrors.length > 0 ? 'errorBorder json-textarea' : 'json-textarea'"
           -->
           <v-textarea
-            label="An array of message objects that each contain email recipient(s) and 'contexts' (eg: 'name') to insert into your mail merge template."
+            label="Ans array of message objects that each contain email recipient(s) and 'contexts' (eg: 'name') to insert into your mail merge template."
             v-model="contexts"
-            :rules="[
-              (v) => !!v || 'A JSON array containing Contexts data is required',
-            ]"
+            @change="updateContexts()"
+            :rules="jsonContextDataRules"
             class="json-textarea"
             hint="Upload the sample Contexts files in Excel format found on the 'About' tab"
             outlined
@@ -153,11 +152,12 @@
               />
               <!-- html -->
               <div v-else class="bodyDiv">
-                <Ckeditor
-                  v-model="bodyHtml"
-                  :value.sync="bodyHtml"
-                  :class="bodyHtmlErrors.length > 0 ? 'errorBorder' : ''"
-                />
+                <div :class="bodyHtmlErrors.length > 0 ? 'errorBorder' : ''">
+                  <Ckeditor
+                    v-model="bodyHtml"
+                    :value.sync="bodyHtml"
+                  />
+                </div>
                 <VMessages :value="bodyHtmlErrors" color="error" class="ma-2" />
               </div>
             </v-tab-item>
@@ -255,6 +255,11 @@ export default {
     showPreviewDialog: false,
 
     // validation
+    jsonContextDataRules: [
+      (v) => !!v || 'A JSON array containing Contexts data is required',
+      (v) => Utils.validJson(v) || 'Must be a valid JSON array.',
+      (v) => Utils.validateContexts(v) || 'The Contexts for the mail merge are not defined correctly'
+    ],
     bodyTextRequiredRule: [(v) => !!v || 'Email Body is required'],
     bodyHtmlErrors: [],
   }),
@@ -389,6 +394,12 @@ export default {
       this.showDeleteContextsExcelDialog = false;
     },
 
+    // when JSON textarea changes, update context variables in store
+    async updateContexts() {
+      const contextVariables = Utils.contextsToVariables(this.contexts);
+      this.contextVariables = contextVariables;
+    },
+
     // Attachments
     async processAttachments(files) {
       const attachments = await Promise.all(
@@ -432,10 +443,11 @@ export default {
       const el = document.querySelector(
         '.v-messages.error--text:first-of-type'
       );
-      el.scrollIntoView(true);
+      if(el) el.scrollIntoView(true);
       window.scrollBy(0, -80);
     },
 
+    // add vuetify-like error to html body editor
     validateHtmlBody() {
       if (this.bodyType === 'html' && this.bodyHtml === '') {
         this.bodyHtmlErrors = ['Email Body is required'];
@@ -449,20 +461,23 @@ export default {
     validateForm() {
       // make JSON contexts element visible to show error if empty
       if (this.contexts == '') this.contextsType = 'json';
-
-      // if vuetify rules pass
       if (
+        // if vuetify rules pass
         this.$refs.form.validate() &&
-        // and bodyHtml is valid
-        this.validateHtmlBody()
+        // and body is valid
+        this.validateHtmlBody() &&
+        // check contexts JSON string contains required properties
+        Utils.validateContexts(this.contexts)
       ) {
         return true;
       }
       return false;
     },
   },
+
   mounted() {
     this.clearAlert();
+    this.reloadForm();
   },
 };
 </script>

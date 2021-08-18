@@ -100,8 +100,7 @@ export default {
 
     addExcelFile(e) {
       this.dragover = false;
-
-      const file = e.dataTransfer.file;
+      const file = e.dataTransfer.files[0];
       // validate Excel file
       if (this.validateFile(file)) {
         // parse file
@@ -126,11 +125,9 @@ export default {
 
     parseFile(file, cb) {
       const reader = new FileReader();
-
       reader.onload = (e) => {
         /* Parse data */
         const bstr = e.target.result;
-
         const wb = XLSX.read(bstr, {
           type: reader.readAsBinaryString ? 'binary' : 'array',
           cellDates: true,
@@ -150,7 +147,7 @@ export default {
         // actual data is rows 2 onward
         excel.data = data.slice(1);
 
-        let contexts = [];
+        let contextsArray = [];
         excel.data.forEach((element) => {
           let message = {
             to: [],
@@ -189,15 +186,15 @@ export default {
                 element[col.key] = message.context[fieldName];
             }
           });
-          if (this.validateContext(message)) contexts.push(message);
+          if (Utils.validateContext(message)) contextsArray.push(message);
         });
 
-        let formContexts = JSON.stringify(contexts, null, 2);
-        const contextVariables = this.contextsToVariables(formContexts);
+        let contextsJson = JSON.stringify(contextsArray, null, 2);
+        const contextVariables = Utils.contextsToVariables(contextsJson);
 
         cb({
           excel: excel,
-          contexts: formContexts,
+          contexts: contextsJson,
           contextVariables: contextVariables,
         });
       };
@@ -250,25 +247,6 @@ export default {
       }
     },
 
-    // turn contexts into nunjucks variables
-    contextsToVariables(contexts) {
-      let result = [];
-      if (contexts) {
-        try {
-          let objs = [];
-          if (typeof contexts === 'string' || contexts instanceof String) {
-            objs = JSON.parse(contexts.trim());
-          } else {
-            objs = contexts;
-          }
-          result = Object.keys(objs[0].context).map((k) => `{{${k}}}`);
-        } catch (e) {
-          result = [];
-        }
-      }
-      return result;
-    },
-
     // process as a custom context unless field looks like a date or timestamp */
     handleDefault(context, data, fieldName, key) {
       const value = data[key];
@@ -302,26 +280,6 @@ export default {
       return undefined;
     },
 
-    validateContext(obj) {
-      try {
-        return obj && obj.to && Array.isArray(obj.to) && obj.to.length > 0;
-      } catch (e) {
-        return false;
-      }
-    },
-
-    validateContexts(contexts) {
-      let result = Array.isArray(contexts) && contexts.length > 0;
-      if (result) {
-        contexts.forEach((c) => {
-          if (!this.validateContext(c)) {
-            result = false;
-          }
-        });
-      }
-      return result;
-    },
-
     fileInputBrowse() {
       this.$refs.fileInput.$refs.input.click();
     },
@@ -329,7 +287,9 @@ export default {
     fileInputChange(e) {
       var dropObj = {
         dataTransfer: {
-          file: e,
+          files: {
+            0: e
+          },
         },
       };
       this.addExcelFile(dropObj);

@@ -1,26 +1,19 @@
-export function getAddresses(csv) {
-  if (csv && csv.trim().length > 0) {
-    return csv.split(',').map(item => item.trim());
-  } else {
-    return [];
+// turn contexts into nunjucks variables
+export function contextsToVariables(contexts) {
+  let result = [];
+  if (contexts) {
+    try {
+      let objs = [];
+      if (typeof contexts === 'string' || contexts instanceof String) {
+        objs = JSON.parse(contexts.trim());
+      } else {
+        objs = contexts;
+      }
+      result = Object.keys(objs[0].context).map((k) => `{{${k}}}`);
+    } catch (e) {
+      result = [];
+    }
   }
-}
-
-export function toCamelCase(str) {
-  // lowercase the str
-  // replace whitespace with _
-  // remove all non-alphanumeric (except _)
-  // remove all repeated _ with single _
-  // remove all _ and change next character to Uppercase
-  const result = str
-    .toLowerCase()
-    .replace(/ /g, '_')
-    .replace(/\W/g, '')
-    .replace(/_+/g, '_')
-    .replace(/_([a-z])/g, function (m) {
-      return m.toUpperCase();
-    })
-    .replace(/_/g, '');
   return result;
 }
 
@@ -43,6 +36,14 @@ export async function fileToBase64(file) {
   });
 }
 
+export function getAddresses(csv) {
+  if (csv && csv.trim().length > 0) {
+    return csv.split(',').map(item => item.trim());
+  } else {
+    return [];
+  }
+}
+
 export function getContextsObject(contexts) {
   try {
     if (contexts && contexts.trim().length > 0) {
@@ -53,4 +54,54 @@ export function getContextsObject(contexts) {
   } catch (e) {
     return [];
   }
+}
+
+export function toCamelCase(str) {
+  // lowercase the str
+  // replace whitespace with _
+  // remove all non-alphanumeric (except _)
+  // remove all repeated _ with single _
+  // remove all _ and change next character to Uppercase
+  const result = str
+    .toLowerCase()
+    .replace(/ /g, '_')
+    .replace(/\W/g, '')
+    .replace(/_+/g, '_')
+    .replace(/_([a-z])/g, function (m) {
+      return m.toUpperCase();
+    })
+    .replace(/_/g, '');
+  return result;
+}
+
+export function validateContext(obj) {
+  try {
+    return obj && obj.to && Array.isArray(obj.to) && obj.to.length > 0;
+  } catch (e) {
+    return false;
+  }
+}
+
+// check contexts JSON string contains required properties
+export function validateContexts(contexts) {
+  // convert to array
+  let contextsArr = getContextsObject(contexts);
+  let result = Array.isArray(contextsArr) && contextsArr.length > 0;
+  if (result) {
+    contextsArr.forEach((obj) => {
+      if (!this.validateContext(obj)) {
+        result = false;
+      }
+    });
+  }
+  return result;
+}
+
+export function validJson(string) {
+  try {
+    JSON.parse(string);
+  } catch (e) {
+    return false;
+  }
+  return true;
 }
