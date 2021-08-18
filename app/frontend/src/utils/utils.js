@@ -89,7 +89,7 @@ export function validateContexts(contexts) {
   let result = Array.isArray(contextsArr) && contextsArr.length > 0;
   if (result) {
     contextsArr.forEach((obj) => {
-      if (!this.validateContext(obj)) {
+      if (!validateContext(obj)) {
         result = false;
       }
     });

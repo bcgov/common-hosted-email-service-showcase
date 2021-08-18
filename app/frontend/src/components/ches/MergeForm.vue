@@ -103,11 +103,8 @@
       <!-- JSON -->
       <v-row v-show="contextsType === 'json'">
         <v-col cols="12" md="12">
-          <!--
-          :class="bodyHtmlErrors.length > 0 ? 'errorBorder json-textarea' : 'json-textarea'"
-          -->
           <v-textarea
-            label="Ans array of message objects that each contain email recipient(s) and 'contexts' (eg: 'name') to insert into your mail merge template."
+            label="An array of message objects that each contain email recipient(s) and 'contexts' (eg: 'name') to insert into your mail merge template."
             v-model="contexts"
             @change="updateContexts()"
             :rules="jsonContextDataRules"

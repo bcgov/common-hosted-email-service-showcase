@@ -193,11 +193,14 @@
             value="Enter your email body here."
             class="mb-3"
           ></v-textarea>
-          <Ckeditor
-            v-else
-            v-model="form.body"
-            :value.sync="form.body"
-          ></Ckeditor>
+          <div v-else :class="bodyHtmlErrors.length > 0 ? 'errorBorder' : ''">
+            <Ckeditor
+              v-model="form.body"
+              :value.sync="form.body"
+            />
+          </div>
+          <VMessages v-if="form.bodyFormat === 'html'" :value="bodyHtmlErrors" color="error" class="ma-2" />
+
         </v-col>
       </v-row>
 
@@ -283,12 +286,24 @@ export default {
         'Please enter all valid email addresses',
     ],
     bodyRequiredRule: [(v) => !!v || 'Email Body is required'],
+    bodyHtmlErrors: [],
   }),
 
   computed: {
     // get current users email from auth vuex module
     currentUserEmail() {
       return this.$store.getters['auth/email'];
+    },
+    // copy to 'un-nested' prop to use in watch
+    computedBody() {
+      return this.form.body;
+    }
+  },
+
+  watch: {
+    // show validation message if bodyHtml is empty
+    computedBody: function () {
+      this.validateHtmlBody();
     },
   },
 
@@ -298,7 +313,8 @@ export default {
 
     // ---- send email ----
     async send() {
-      if (this.$refs.form.validate()) {
+      if (this.validateForm()) {
+      //if (this.$refs.form.validate()) {
         try {
           // create email object
           const email = {
@@ -366,6 +382,30 @@ export default {
       };
       window.scrollTo(0, 0);
     },
+
+    // add vuetify-like error to html body editor
+    validateHtmlBody() {
+      if (this.form.bodyFormat === 'html' && this.form.body === '') {
+        this.bodyHtmlErrors = ['Email Body is required'];
+        return false;
+      } else {
+        this.bodyHtmlErrors = [];
+        return true;
+      }
+    },
+
+    validateForm() {
+      if (
+        // if vuetify rules pass
+        this.$refs.form.validate() &&
+        // and body is valid
+        this.validateHtmlBody()
+      ) {
+        return true;
+      }
+      return false;
+    },
+
   },
   mounted() {
     this.clearAlert();
@@ -399,5 +439,9 @@ export default {
 /* give wysiwyg editor a min height */
 .bodyDiv ::v-deep .ck-editor__editable {
   min-height:180px;
+}
+/*invalid input field border */
+.errorBorder {
+  border: 1px solid red;
 }
 </style>
