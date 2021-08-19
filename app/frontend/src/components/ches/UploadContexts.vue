@@ -247,7 +247,7 @@ export default {
       }
     },
 
-    // process as a custom context unless field looks like a date or timestamp */
+    // process as a custom context unless field looks like a date or timestamp
     handleDefault(context, data, fieldName, key) {
       const value = data[key];
       const isDate = isValid(parse(value, Formats.TEST_DT_FORMAT, new Date()));
@@ -258,14 +258,12 @@ export default {
           format(dateObj, Formats.CONTEXTS_TS_FORMAT) !== 'Invalid Date'
             ? format(dateObj, Formats.CONTEXTS_TS_FORMAT)
             : value;
-      }
-      else if (isDate) {
+      } else if (isDate) {
         context[fieldName] =
           format(dateObj, Formats.CONTEXTS_DT_FORMAT) !== 'Invalid Date'
             ? format(dateObj, Formats.CONTEXTS_DT_FORMAT)
             : value;
-      }
-      else {
+      }  else {
         context[fieldName] = value;
       }
     },

@@ -121,8 +121,8 @@
         <!-- body -->
         <v-col cols="12" md="12">
           <v-tabs vertical class="merge-tabs pt-0">
-            <v-tab> Body</v-tab>
-            <v-tab v-show="contextVariables.length">Variables </v-tab>
+            <v-tab>Body</v-tab>
+            <v-tab v-show="contextVariables.length">Variables</v-tab>
 
             <v-tab-item>
               <!-- body format -->
@@ -200,7 +200,7 @@
         </v-col>
         <!-- preview button -->
         <v-col md="4">
-          <v-btn width="100%" large outlined @click="loadPreview()">
+          <v-btn width="100%" large outlined @click="loadPreview">
             <span>Preview</span>
           </v-btn>
           <MergePreviewDialog
@@ -210,7 +210,7 @@
         </v-col>
         <!-- Send button -->
         <v-col md="4">
-          <v-btn width="100%" large color="primary" @click="send()">
+          <v-btn width="100%" large color="primary" @click="send">
             <span>Send</span>
           </v-btn>
         </v-col>
@@ -457,7 +457,7 @@ export default {
 
     validateForm() {
       // make JSON contexts element visible to show error if empty
-      if (this.contexts == '') this.contextsType = 'json';
+      if (this.contexts === '') this.contextsType = 'json';
       if (
         // if vuetify rules pass
         this.$refs.form.validate() &&
@@ -548,6 +548,6 @@ export default {
 }
 /*invalid input field border */
 .errorBorder {
-  border: 1px solid red;
+  border: 2px solid red;
 }
 </style>

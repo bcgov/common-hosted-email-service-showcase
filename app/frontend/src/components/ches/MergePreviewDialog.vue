@@ -153,7 +153,7 @@ export default {
           cc: [],
           subject: '',
           bodyType: '',
-          bpsy: '',
+          body: '',
           attachments: [],
         };
     },

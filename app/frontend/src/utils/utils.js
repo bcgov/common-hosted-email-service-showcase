@@ -67,16 +67,14 @@ export function toCamelCase(str) {
     .replace(/ /g, '_')
     .replace(/\W/g, '')
     .replace(/_+/g, '_')
-    .replace(/_([a-z])/g, function (m) {
-      return m.toUpperCase();
-    })
+    .replace(/_([a-z])/g, (m) => m.toUpperCase())
     .replace(/_/g, '');
   return result;
 }
 
 export function validateContext(obj) {
   try {
-    return obj && obj.to && Array.isArray(obj.to) && obj.to.length > 0;
+    return obj && obj.to && Array.isArray(obj.to) && obj.to.length;
   } catch (e) {
     return false;
   }
@@ -86,7 +84,7 @@ export function validateContext(obj) {
 export function validateContexts(contexts) {
   // convert to array
   let contextsArr = getContextsObject(contexts);
-  let result = Array.isArray(contextsArr) && contextsArr.length > 0;
+  let result = Array.isArray(contextsArr) && contextsArr.length;
   if (result) {
     contextsArr.forEach((obj) => {
       if (!validateContext(obj)) {
