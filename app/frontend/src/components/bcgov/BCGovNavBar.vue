@@ -9,6 +9,9 @@
           <router-link :to="{ name: 'Email'}" >Email</router-link>
         </li>
         <li>
+          <router-link :to="{ name: 'Merge'}" >Merge</router-link>
+        </li>
+        <li>
           <router-link :to="{ name: 'Performance'}" >Performance</router-link>
         </li>
       </ul>

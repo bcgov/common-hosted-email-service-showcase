@@ -1,0 +1,27 @@
+<h2>{{greeting}} {{scope}}</h2>
+<blockquote>
+<p>{{quote}}</p>
+- {{source}}<br />
+</blockquote>
+
+<table style="float: left; border-collapse: collapse; border="1">
+<tbody>
+<tr>
+  <td style="text-align: left;">
+    <span style="font-family: helvetica, arial, sans-serif;"><strong>Start Date</strong></span>
+  </td>
+  <td style="text-align: left;">
+    <span style="font-family: 'courier new', courier, monospace;">{{startDate}}</span>
+  </td>
+</tr>
+<tr>
+  <td style="text-align: left;">
+    <span style="font-family: helvetica, arial, sans-serif;"><strong>End Date</strong></span>
+  </td>
+  <td style="text-align: left;">
+    <span style="font-family: 'courier new', courier, monospace;">{{endDateTs}}</span>
+  </td>
+</tr>
+
+</tbody>
+</table>

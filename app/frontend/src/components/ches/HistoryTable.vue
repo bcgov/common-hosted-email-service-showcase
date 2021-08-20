@@ -65,7 +65,6 @@
 <script>
 import { format } from 'date-fns';
 import { mapActions, mapGetters } from 'vuex';
-import chesService from '@/services/chesService';
 
 export default {
   name: 'HistoryTable',
@@ -79,6 +78,7 @@ export default {
       { text: 'Tag', align: 'start', value: 'tag' },
       { text: 'Status', align: 'start', value: 'status' },
       { text: 'Delayed', align: 'start', value: 'delayTS', width: 150 },
+      // TODO: implement promote and cancel actions
       // {
       //   text: 'Actions',
       //   align: 'end',
@@ -95,7 +95,7 @@ export default {
 
   methods: {
     ...mapActions('alert', ['showAlert', 'clearAlert']),
-    ...mapActions('ches', ['addTableData']),
+    ...mapActions('ches', ['addTableData', 'populateTable']),
 
     cancelMessage(msgId) {
       console.log('cancelMessage', msgId); // eslint-disable-line no-console
@@ -105,46 +105,19 @@ export default {
       return ['completed', 'cancelled'].includes(status);
     },
 
-    // get status details for each message in tansactions in store
-    populateTable() {
-      this.error = false;
-      this.loading = true;
-
-      try {
-        // TODO: Move this logic into vuex - do this BEFORE adding in remove/promote logic
-        // for each email transaction in store, get full status of messages
-        this.txIds.forEach(async (tx) => {
-          // if transaction isnt already in 'this.tableData' (vuex tableData property)
-          if (!this.tableData.find((o) => o.txId === tx.txId)) {
-            // get status details from CHES and add to tableData
-            const { data } = await chesService.getStatusByTransactionId(
-              tx.txId
-            );
-            this.addTableData(...data);
-          }
-        });
-      } catch (e) {
-        this.error = true;
-        this.showAlert({
-          type: 'error',
-          text: e,
-        });
-      }
-      this.loading = false;
-    },
-
     promoteMessage(msgId) {
       console.log('promoteMessage', msgId); // eslint-disable-line no-console
     },
 
     humanDateTime(timestamp){
       // date-fns docs: https://date-fns.org/v2.21.1/docs/Getting-Started
-      return timestamp === 0 ? '-' : format(new Date(timestamp), 'yyyy-MM-dd HH:mm');
+      return timestamp ? format(new Date(timestamp), 'yyyy-MM-dd HH:mm') : '-';
     }
   },
 
   mounted() {
     this.clearAlert();
+    // get each message's status details in ches vuex module
     this.populateTable();
   },
 };

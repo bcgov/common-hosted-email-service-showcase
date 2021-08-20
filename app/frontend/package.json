@@ -18,7 +18,16 @@
   },
   "dependencies": {
     "@bcgov/bc-sans": "^1.0.1",
-    "@ckeditor/ckeditor5-build-classic": "^27.1.0",
+    "@ckeditor/ckeditor5-basic-styles": "^29.1.0",
+    "@ckeditor/ckeditor5-dev-utils": "^25.4.1",
+    "@ckeditor/ckeditor5-dev-webpack-plugin": "^25.4.1",
+    "@ckeditor/ckeditor5-editor-classic": "^29.1.0",
+    "@ckeditor/ckeditor5-essentials": "^29.1.0",
+    "@ckeditor/ckeditor5-link": "^29.1.0",
+    "@ckeditor/ckeditor5-paragraph": "^29.1.0",
+    "@ckeditor/ckeditor5-source-editing": "^29.1.0",
+    "@ckeditor/ckeditor5-table": "^29.1.0",
+    "@ckeditor/ckeditor5-theme-lark": "^29.1.0",
     "@ckeditor/ckeditor5-vue2": "^1.0.5",
     "axios": "^0.21.1",
     "core-js": "^3.10.1",
@@ -30,7 +39,8 @@
     "vuetify": "^2.4.9",
     "vuex": "^3.6.2",
     "vuex-map-fields": "^1.4.1",
-    "vuex-persistedstate": "^3.2.0"
+    "vuex-persistedstate": "^3.2.0",
+    "xlsx": "^0.17.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.5.12",
@@ -47,7 +57,9 @@
     "eslint-plugin-vue": "^7.9.0",
     "eslint-plugin-vuetify": "^1.0.0-beta.6",
     "node-sass": "^5.0.0",
+    "postcss-loader": "^3.0.0",
     "prettier": "^2.2.1",
+    "raw-loader": "^0.5.1",
     "sass": "^1.32.8",
     "sass-loader": "^10.1.0",
     "vue-cli-plugin-vuetify": "^2.3.1",

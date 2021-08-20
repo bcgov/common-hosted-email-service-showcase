@@ -193,12 +193,14 @@
             value="Enter your email body here."
             class="mb-3"
           ></v-textarea>
-          <ckeditor
-            v-else
-            :editor="editor"
-            v-model="form.body"
-            :config="editorConfig"
-          ></ckeditor>
+          <div v-else :class="bodyHtmlErrors.length > 0 ? 'errorBorder' : ''">
+            <Ckeditor
+              v-model="form.body"
+              :value.sync="form.body"
+            />
+          </div>
+          <VMessages v-if="form.bodyFormat === 'html'" :value="bodyHtmlErrors" color="error" class="ma-2" />
+
         </v-col>
       </v-row>
 
@@ -216,13 +218,13 @@
 
       <v-row justify="center" class="my-10">
         <v-col md="4">
-          <v-btn width="100%" large color="primary" @click="send()">
-            <span>Send</span>
+          <v-btn width="100%" large outlined @click="reloadForm">
+            <span>Cancel</span>
           </v-btn>
         </v-col>
         <v-col md="4">
-          <v-btn width="100%" large outlined @click="reloadForm">
-            <span>Cancel</span>
+          <v-btn width="100%" large color="primary" @click="send()">
+            <span>Send</span>
           </v-btn>
         </v-col>
       </v-row>
@@ -233,21 +235,24 @@
 <script>
 import { mapActions } from 'vuex';
 
+import chesService from '@/services/chesService';
+
+import * as Utils from '@/utils/utils';
+import { Regex } from '../../utils/constants';
+
 import DatetimePicker from '@/components/vuetify/DatetimePicker';
 import Upload from '@/components/ches/Upload';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-
-import chesService from '@/services/chesService';
-import { Regex } from '../../utils/constants';
+import Ckeditor from '@/components/ches/Ckeditor';
 
 export default {
   name: 'EmailForm',
   components: {
     Upload,
     'v-datetime-picker': DatetimePicker,
+    Ckeditor,
   },
   data: () => ({
-    // form fields
+    // form data fields
     form: {
       attachments: [],
       bcc: [],
@@ -268,13 +273,8 @@ export default {
       { text: 'High', value: 'high' },
       { text: 'Low', value: 'low' },
     ],
-    editor: ClassicEditor,
-    editorConfig: {
-      toolbar: {
-        items: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote'],
-      },
-    },
 
+    // --- form validation rules --
     // at least one email required in combobox
     emailRequiredRule: [
       (v) => v.length > 0 || 'Please enter at least 1 email address',
@@ -286,6 +286,7 @@ export default {
         'Please enter all valid email addresses',
     ],
     bodyRequiredRule: [(v) => !!v || 'Email Body is required'],
+    bodyHtmlErrors: [],
   }),
 
   computed: {
@@ -293,14 +294,27 @@ export default {
     currentUserEmail() {
       return this.$store.getters['auth/email'];
     },
+    // copy to 'un-nested' prop to use in watch
+    computedBody() {
+      return this.form.body;
+    }
+  },
+
+  watch: {
+    // show validation message if bodyHtml is empty
+    computedBody: function () {
+      this.validateHtmlBody();
+    },
   },
 
   methods: {
     ...mapActions('alert', ['showAlert', 'clearAlert']),
     ...mapActions('ches', ['addTransaction']),
 
+    // ---- send email ----
     async send() {
-      if (this.$refs.form.validate()) {
+      if (this.validateForm()) {
+      //if (this.$refs.form.validate()) {
         try {
           // create email object
           const email = {
@@ -319,17 +333,14 @@ export default {
             tag: this.form.tag,
             to: this.form.recipients,
           };
-
           // send email with ches service
           const { data } = await chesService.email(email);
-
           // show success alert
           this.showAlert({
             type: 'success',
             text:
               `<strong>Your email has been successfully sent.<br />Transaction ID: </strong>${data.txId} <strong>Message ID: </strong> ${data.messages[0].msgId}`,
           });
-
           // update store
           this.addTransaction(data);
           this.reloadForm();
@@ -349,28 +360,9 @@ export default {
 
     async processAttachments(files) {
       const attachments = await Promise.all(
-        files.map((file) => this.convertFileToAttachment(file))
+        files.map((file) => Utils.convertFileToAttachment(file))
       );
       this.form.attachments = attachments;
-    },
-
-    async convertFileToAttachment(file) {
-      const content = await this.fileToBase64(file);
-      return {
-        content: content,
-        contentType: file.type,
-        filename: file.name,
-        encoding: 'base64',
-      };
-    },
-
-    async fileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result.replace(/^.*,/, ''));
-        reader.onerror = (error) => reject(error);
-      });
     },
 
     reloadForm() {
@@ -390,6 +382,30 @@ export default {
       };
       window.scrollTo(0, 0);
     },
+
+    // add vuetify-like error to html body editor
+    validateHtmlBody() {
+      if (this.form.bodyFormat === 'html' && this.form.body === '') {
+        this.bodyHtmlErrors = ['Email Body is required'];
+        return false;
+      } else {
+        this.bodyHtmlErrors = [];
+        return true;
+      }
+    },
+
+    validateForm() {
+      if (
+        // if vuetify rules pass
+        this.$refs.form.validate() &&
+        // and body is valid
+        this.validateHtmlBody()
+      ) {
+        return true;
+      }
+      return false;
+    },
+
   },
   mounted() {
     this.clearAlert();
@@ -405,16 +421,27 @@ export default {
 .v-select ::v-deep .v-select__selections {
   line-height: 22px;
 }
+/* inline labels */
+.flex-label {
+  width: 6rem;
+  margin-top: 6px;
+}
 /* make radio buttons inline */
 .v-input--radio-group ::v-deep .v-input--radio-group__input {
   flex-direction: row !important;
-}
-.v-input--radio-group ::v-deep .v-input--radio-group__input > div {
-  margin-bottom: 0 !important;
-  margin-left: 2rem;
+  & > div {
+    margin-bottom: 0 !important;
+    &:not(:first-child) {
+      margin-left: 2rem;
+    }
+  }
 }
 /* give wysiwyg editor a min height */
 .bodyDiv ::v-deep .ck-editor__editable {
   min-height:180px;
+}
+/*invalid input field border */
+.errorBorder {
+  border: 1px solid red;
 }
 </style>
