@@ -4,9 +4,9 @@
       <v-row>
         <v-col cols="12">
           <h3 class="mb-4">CHES Showcase - Mail Merge</h3>
-          <p>The Mail Merge page demonstrates the email merge and templating capabilites of CHES. CHES supports
-            sending a list of recipients (to, cc, bcc) a templated Subject and body. This allows an application to
-            send personalized emails in batch mode.</p>
+          <p>The Mail Merge page demonstrates the email merge and templating capabilites of CHES.<br />
+            CHES supports sending a list of recipients (to, cc, bcc) a templated subject and body.<br />
+            This allows an application to send personalized emails in batch mode.</p>
 
           <p>To showcase CHES, we have added some nice features to turn an Excel spreadsheet or CVS file into a
             CHES Mail Merge request. See below for some sample data and a template you can use as a guide to
@@ -20,13 +20,12 @@
             &quot;General&quot;), or convert your sheet to CSV and format your dates to &quot;yyyy-mm-dd&quot; and time
             stamps to &quot;yyyy-mm-dd h:mm&quot;.
           </p>
-
           <ul class="mb-4">
             <li>
-              <a :href="`${publicPath}examples/mssc-ches-merge-example.csv`" download="mssc-ches-merge-example-csv.csv">example csv</a>
+              <a :href="`${publicPath}examples/mssc-ches-merge-example.csv`" download="mssc-ches-merge-example-csv.csv">example data csv</a>
             </li>
             <li>
-              <a :href="`${publicPath}examples/mssc-ches-merge-example.xlsx`" download="mssc-ches-merge-example-excel.xlsx">example xlsx</a>
+              <a :href="`${publicPath}examples/mssc-ches-merge-example.xlsx`" download="mssc-ches-merge-example-excel.xlsx">example data xlsx</a>
             </li>
             <li>
               <a :href="`${publicPath}examples/mssc-ches-merge-example.txt`" download="mssc-ches-merge-example-template.txt">example html template</a>
@@ -34,13 +33,12 @@
           </ul>
           <h4 class="my-2">Guide</h4>
           <ol class="mb-4">
-            <li>Download the two examples.</li>
-            <li>One the merge screen, click the Excel button, and upload the CSV file.</li>
-            <li>Review the contents of the table</li>
-            <li>Click the JSON button and review the contents - this the context list sent to CHES</li>
-            <li>For the body, click the HTML button to bring up the editor, then click View, click Source Code.
-            </li>
-            <li>Paste the contents of the example html template into the Source Code view and Save.</li>
+            <li>Download a data file and a template from the examples.</li>
+            <li>On the merge screen, drag/upload the data file into the contexts field.</li>
+            <li>Review the contents of the table.</li>
+            <li>Click the JSON radio button to review the contents - this the context list sent to CHES.</li>
+            <li>For the body, use the html format editor.<br />
+              Click the 'Source' button in the editor's toolbar to insert the html from the example template</li>
             <li>For the Subject, enter &quot;ATTN&#58; &#123;&#123;scope&#125;&#125;&#33;&quot;</li>
             <li>Click Preview</li>
           </ol>
