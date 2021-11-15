@@ -1,3 +1,4 @@
+// import Vue from 'vue';
 import { getField, updateField } from 'vuex-map-fields';
 import chesService from '@/services/chesService';
 
@@ -12,6 +13,7 @@ export default {
     txIds: [],
     // History table data
     tableData: [],
+    tableLoading: true,
 
     // merge form
     mergeForm: {
@@ -53,8 +55,19 @@ export default {
       state.txIds.push(txId);
     },
 
-    ADD_TABLEDATA(state, data) {
+    UPDATE_TABLEDATA(state, data) {
+      // if message already in table..
+      const index = state.tableData.findIndex((message) => message.msgId === data.msgId);
+      if(index > -1 ) {
+        // remove existing message from table
+        state.tableData.splice(index, 1);
+      }
+      // add message to table
       state.tableData.push(data);
+    },
+
+    UPDATE_TABLELOADING(state, loading) {
+      state.tableLoading = loading;
     },
 
     CLEAR_TXID(state) {
@@ -71,38 +84,45 @@ export default {
       commit('ADD_TXID', txId);
     },
 
-    addTableData({ commit }, data) {
-      commit('ADD_TABLEDATA', data);
-    },
-    // commit,
-    populateTable({ commit, state }) {
-      try {
-        // for each existing tx in txIds array
-        state.txIds.forEach(async (tx) => {
-          // if tableData doesnt contain an object with txId = tx.txId
-          if (!state.tableData.find((o) => o.txId === tx.txId)) {
-            // for each of the messages in tx
-            tx.messages.forEach(async (message) => {
-              // get details from CHES and add to tableData
+    // populates history table each time the component is mounted
+    async populateTable({ commit, state, dispatch }) {
+
+      commit('UPDATE_TABLELOADING', true);
+
+      // for each of the transactions that exists in local storage
+      state.txIds.forEach( (tx) => {
+        // for each of the messages in tx
+        tx.messages.forEach(async (message) => {
+          // if existing tableData doesnt contain this transaction, and the message in this row of table has a status that is not 'completed' or 'cancelled'
+          if (!state.tableData.find((o) => (o.txId === tx.txId && (o.status === 'completed' || o.status === 'cancelled')))) {
+
+            try {
+              // get details for that message (status, smpt response, etc) from CHES and update tableData
+              // note: this call tyo CHES api returns an array containing a single object
               const { data } = await chesService.getStatusByMessageId(
                 message.msgId
               );
-              commit('ADD_TABLEDATA', ...data);
-            });
+
+              // update message/transaction data in table
+              commit('UPDATE_TABLEDATA', data[0]);
+            }
+            // if problem getting data from CHES api show error alert
+            catch (e) {
+              dispatch('alert/showAlert', {
+                type: 'error',
+                text: e,
+              }, { root: true });
+            }
           }
         });
+      });
 
-      } catch (e) {
-        // this.error = true;
-        // this.showAlert({
-        //   type: 'error',
-        //   text: e,
-        // });
-      }
+      commit('UPDATE_TABLELOADING', false);
     },
 
-    clearHistory({ commit }) {
+    clearTable({ commit }) {
       commit('CLEAR_TXID');
+      commit('CLEAR_TABLEDATA');
     },
   }
 };

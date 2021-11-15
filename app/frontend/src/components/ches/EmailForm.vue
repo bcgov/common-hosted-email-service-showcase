@@ -336,10 +336,11 @@ export default {
           // send email with ches service
           const { data } = await chesService.email(email);
           // show success alert
+          const verb = email.delayTS > 0 ? 'scheduled' : 'sent';
           this.showAlert({
             type: 'success',
             text:
-              `<strong>Your email has been successfully sent.<br />Transaction ID: </strong>${data.txId} <strong>Message ID: </strong> ${data.messages[0].msgId}`,
+              `<strong>Your email has been successfully ${verb}.<br />Transaction ID: </strong>${data.txId} <strong>Message ID: </strong> ${data.messages[0].msgId}`,
           });
           // update store
           this.addTransaction(data);

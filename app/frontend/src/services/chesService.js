@@ -18,7 +18,7 @@ export default {
   * @returns {Promise} An axios response
   */
   cancel(msgId) {
-    return appAxios().get(`${ApiRoutes.CHES_CANCEL}/${msgId}`);
+    return appAxios().delete(`${ApiRoutes.CHES_CANCEL}/${msgId}`);
   },
 
   /**
@@ -74,7 +74,7 @@ export default {
   * @returns {Promise} An axios response
   */
   promote(msgId) {
-    return appAxios().get(`${ApiRoutes.CHES_PROMOTE}/${msgId}`);
+    return appAxios().post(`${ApiRoutes.CHES_PROMOTE}/${msgId}`);
   },
 };
 
