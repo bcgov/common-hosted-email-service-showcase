@@ -16,7 +16,8 @@
       :items="tableData"
       :search="search"
       :loading="tableLoading"
-      :sort-by="'createdTS'"
+      sort-by="createdTS"
+      sort-desc
     >
       <template #[`item.tag`]="{ item }">
         <span>{{ item.tag ? item.tag : '-'}}</span>
@@ -63,10 +64,10 @@
 
       <template v-slot:[`footer.prepend`]>
         <v-btn color="primary" small class="ma-2" @click="populateTable">
-          Refresh<v-icon small class="ml-2">refresh</v-icon>
+          <v-icon small class="mr-1">refresh</v-icon><span>Refresh</span>
         </v-btn>
-        <v-btn color="primary" small class="ma-2" @click="clearTable">
-          Clear<v-icon small class="ml-2">clear</v-icon>
+        <v-btn v-if="tableData.length" color="primary" small class="ma-2" @click="clearTable">
+          <v-icon small class="mr-1">clear</v-icon><span>Clear</span>
         </v-btn>
       </template>
     </v-data-table>
@@ -79,6 +80,8 @@ import { mapActions, mapGetters } from 'vuex';
 import { mapFields } from 'vuex-map-fields';
 
 import chesService from '@/services/chesService';
+import { TerminalStates } from '@/utils/constants';
+
 export default {
   name: 'HistoryTable',
   data: () => ({
@@ -100,8 +103,8 @@ export default {
   },
 
   methods: {
-    ...mapActions('alert', ['showAlert', 'clearAlert']),
-    ...mapActions('ches', ['populateTable', 'clearTable']),
+    ...mapActions('alert', ['clearAlert', 'showAlert']),
+    ...mapActions('ches', ['clearTable', 'populateTable']),
 
 
     async cancelMessage(msgId) {
@@ -127,18 +130,13 @@ export default {
     },
 
     isTerminalState(status) {
-      return ['completed', 'cancelled'].includes(status);
+      return TerminalStates.includes(status);
     },
 
     async promoteMessage(msgId) {
       try {
         // wait for OK status from CHES api (does not mean message has been promoted yet)
         await chesService.promote(msgId);
-        // promote seems to take longer than cancel to complete and show in status from CHES
-        await new Promise(resolve => {
-          setTimeout(resolve, 1000);
-          this.tableLoading = true;
-        });
         this.populateTable();
         // show success alert
         this.showAlert({
@@ -162,10 +160,10 @@ export default {
     },
   },
 
-  async mounted() {
+  mounted() {
     this.clearAlert();
     // get each message's status details in ches vuex module
-    await this.populateTable();
+    this.populateTable();
   },
 };
 </script>

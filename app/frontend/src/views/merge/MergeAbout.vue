@@ -22,10 +22,10 @@
           </p>
           <ul class="mb-4">
             <li>
-              <a :href="`${publicPath}examples/mssc-ches-merge-example.csv`" download="mssc-ches-merge-example-csv.csv">example data csv</a>
+              <a :href="`${publicPath}examples/mssc-ches-merge-example.csv`" download="mssc-ches-merge-example-csv.csv">example csv data</a>
             </li>
             <li>
-              <a :href="`${publicPath}examples/mssc-ches-merge-example.xlsx`" download="mssc-ches-merge-example-excel.xlsx">example data xlsx</a>
+              <a :href="`${publicPath}examples/mssc-ches-merge-example.xlsx`" download="mssc-ches-merge-example-excel.xlsx">example xlsx data</a>
             </li>
             <li>
               <a :href="`${publicPath}examples/mssc-ches-merge-example.txt`" download="mssc-ches-merge-example-template.txt">example html template</a>
