@@ -15,6 +15,9 @@
       :headers="headers"
       :items="tableData"
       :search="search"
+      :loading="tableLoading"
+      sort-by="createdTS"
+      sort-desc
     >
       <template #[`item.tag`]="{ item }">
         <span>{{ item.tag ? item.tag : '-'}}</span>
@@ -24,7 +27,7 @@
         <span>{{ humanDateTime(item.delayTS) }}</span>
       </template>
 
-      <!-- <template #[`item.actions`]="{ item }">
+      <template #[`item.actions`]="{ item }">
         <v-tooltip bottom>
           <template #activator="{ on, attrs }">
             <v-btn
@@ -57,7 +60,16 @@
           </template>
           <span>Cancel Scheduled Send</span>
         </v-tooltip>
-      </template> -->
+      </template>
+
+      <template v-slot:[`footer.prepend`]>
+        <v-btn color="primary" small class="ma-2" @click="populateTable">
+          <v-icon small class="mr-1">refresh</v-icon><span>Refresh</span>
+        </v-btn>
+        <v-btn v-if="tableData.length" color="primary" small class="ma-2" @click="clearTable">
+          <v-icon small class="mr-1">clear</v-icon><span>Clear</span>
+        </v-btn>
+      </template>
     </v-data-table>
   </v-container>
 </template>
@@ -65,12 +77,15 @@
 <script>
 import { format } from 'date-fns';
 import { mapActions, mapGetters } from 'vuex';
+import { mapFields } from 'vuex-map-fields';
+
+import chesService from '@/services/chesService';
+import { TerminalStates } from '@/utils/constants';
 
 export default {
   name: 'HistoryTable',
   data: () => ({
     error: false,
-    loading: false,
     search: '',
     headers: [
       { text: 'Transaction ID', align: 'start', value: 'txId' },
@@ -78,41 +93,71 @@ export default {
       { text: 'Tag', align: 'start', value: 'tag' },
       { text: 'Status', align: 'start', value: 'status' },
       { text: 'Delayed', align: 'start', value: 'delayTS', width: 150 },
-      // TODO: implement promote and cancel actions
-      // {
-      //   text: 'Actions',
-      //   align: 'end',
-      //   value: 'actions',
-      //   filterable: false,
-      //   sortable: false,
-      // },
+      { text: 'Actions', align: 'start', value: 'actions', width: 120, filterable: false, sortable: false }
     ],
   }),
 
   computed: {
-    ...mapGetters('ches', ['txIds', 'tableData']),
+    ...mapGetters('ches', ['txIds']),
+    ...mapFields('ches', ['tableData', 'tableLoading'])
   },
 
   methods: {
-    ...mapActions('alert', ['showAlert', 'clearAlert']),
-    ...mapActions('ches', ['addTableData', 'populateTable']),
+    ...mapActions('alert', ['clearAlert', 'showAlert']),
+    ...mapActions('ches', ['clearTable', 'populateTable']),
 
-    cancelMessage(msgId) {
-      console.log('cancelMessage', msgId); // eslint-disable-line no-console
+
+    async cancelMessage(msgId) {
+      try {
+        // wait for OK status from CHES api
+        await chesService.cancel(msgId);
+        // update store with latest table data
+        this.populateTable();
+        // show success alert
+        this.showAlert({
+          type: 'success',
+          text: `<strong>Your message has been successfully cancelled.<br />Message ID: </strong> ${msgId}`,
+        });
+      } catch (e) {
+        this.error = true;
+        // show error alert
+        this.showAlert({
+          type: 'error',
+          text: e,
+        });
+      }
+      window.scrollTo(0, 0);
     },
 
     isTerminalState(status) {
-      return ['completed', 'cancelled'].includes(status);
+      return TerminalStates.includes(status);
     },
 
-    promoteMessage(msgId) {
-      console.log('promoteMessage', msgId); // eslint-disable-line no-console
+    async promoteMessage(msgId) {
+      try {
+        // wait for OK status from CHES api (does not mean message has been promoted yet)
+        await chesService.promote(msgId);
+        this.populateTable();
+        // show success alert
+        this.showAlert({
+          type: 'success',
+          text: `<strong>Your message has been successfully promoted.<br />Message ID: </strong> ${msgId}`,
+        });
+      } catch (e) {
+        this.error = true;
+        // show error alert
+        this.showAlert({
+          type: 'error',
+          text: e,
+        });
+      }
+      window.scrollTo(0, 0);
     },
 
-    humanDateTime(timestamp){
+    humanDateTime(timestamp) {
       // date-fns docs: https://date-fns.org/v2.21.1/docs/Getting-Started
       return timestamp ? format(new Date(timestamp), 'yyyy-MM-dd HH:mm') : '-';
-    }
+    },
   },
 
   mounted() {
@@ -133,5 +178,3 @@ export default {
   clear: both;
 }
 </style>
-
-

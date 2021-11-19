@@ -37,3 +37,5 @@ export const Formats = Object.freeze({
   EXCEL_PARSE_FORMAT: 'm/d/yy h:mm',
   TEST_DT_FORMAT: 'M/d/yy HH:mm',
 });
+
+export const TerminalStates = ['completed', 'cancelled'];
