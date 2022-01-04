@@ -33,6 +33,9 @@ module.exports = {
   // transpileDependencies: [
   //   /ckeditor5-[^/\\]+[/\\]src[/\\].+\.js$/,
   // ],
+
+  // Prod build/bundle has an issue with ckeditor and default vue cfg
+  // See https://github.com/ckeditor/ckeditor5-vue/issues/136
   parallel: false,
 
   configureWebpack: {
