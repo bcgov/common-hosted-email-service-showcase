@@ -18,7 +18,7 @@ export function contextsToVariables(contexts) {
 }
 
 export async function convertFileToAttachment(file) {
-  const content = await this.fileToBase64(file);
+  const content = await fileToBase64(file);
   return {
     content: content,
     contentType: file.type,
