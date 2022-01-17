@@ -16,12 +16,10 @@ const chesService = require('../../../src/ches/chesService');
 // Simple Express Server
 const basePath = '/ches';
 const app = helper.expressHelper(basePath, router);
-helper.logHelper();
 
 afterEach(() => {
   jest.clearAllMocks();
 });
-
 
 // health route
 describe(`GET ${basePath}/health`, () => {
@@ -30,7 +28,6 @@ describe(`GET ${basePath}/health`, () => {
   afterEach(() => {
     healthSpy.mockReset();
   });
-
 
   it('should yield a created response', async () => {
 
@@ -44,7 +41,6 @@ describe(`GET ${basePath}/health`, () => {
     expect(response.body).toMatch('test');
     expect(healthSpy).toHaveBeenCalledTimes(1);
   });
-
 
   it('should yield an error and fail gracefully', async () => {
 
@@ -61,8 +57,6 @@ describe(`GET ${basePath}/health`, () => {
   });
 });
 
-
-
 // email route
 describe(`POST ${basePath}/email`, () => {
 
@@ -70,7 +64,6 @@ describe(`POST ${basePath}/email`, () => {
   afterEach(() => {
     sendSpy.mockReset();
   });
-
 
   it('should yield a created response', async () => {
 
@@ -84,7 +77,6 @@ describe(`POST ${basePath}/email`, () => {
     expect(response.body).toMatch('test');
     expect(sendSpy).toHaveBeenCalledTimes(1);
   });
-
 
   it('should yield an error and fail gracefully', async () => {
 
@@ -110,7 +102,6 @@ describe(`GET ${basePath}/status/:msgId?`, () => {
     getStatusSpy.mockReset();
   });
 
-
   it('should yield a created response', async () => {
 
     getStatusSpy.mockImplementation(() => {
@@ -123,7 +114,6 @@ describe(`GET ${basePath}/status/:msgId?`, () => {
     expect(response.body).toMatch('test');
     expect(getStatusSpy).toHaveBeenCalledTimes(1);
   });
-
 
   it('should yield an error and fail gracefully', async () => {
 

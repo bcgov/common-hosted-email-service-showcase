@@ -1,8 +1,5 @@
-const helper = require('../../common/helper');
 const controller = require('../../../src/ches/controller');
 const chesService = require('../../../src/ches/chesService');
-
-helper.logHelper();
 
 describe('healthCheck', () => {
 

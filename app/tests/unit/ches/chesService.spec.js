@@ -2,7 +2,6 @@ const axios = require('axios');
 const config = require('config');
 const MockAdapter = require('axios-mock-adapter');
 
-const helper = require('../../common/helper');
 const chesService = require('../../../src/ches/chesService');
 const errorToProblem = require('../../../src/components/errorToProblem');
 
@@ -12,8 +11,6 @@ const mockAxios = new MockAdapter(mockInstance);
 
 chesService.axios = mockInstance;
 jest.mock('../../../src/components/errorToProblem');
-
-helper.logHelper();
 
 describe('chesService', () => {
   beforeEach(() => {
