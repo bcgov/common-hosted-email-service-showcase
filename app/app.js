@@ -21,10 +21,6 @@ app.use(compression());
 app.use(express.json({ limit: config.get('server.bodyLimit') }));
 app.use(express.urlencoded({ extended: true }));
 
-// Logging Setup
-log.level = config.get('server.logLevel');
-log.addLevel('debug', 1500, { fg: 'cyan' });
-
 // Skip if running tests
 if (process.env.NODE_ENV !== 'test') {
   app.use(httpLogger);
