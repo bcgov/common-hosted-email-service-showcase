@@ -3,9 +3,9 @@
 /** Module dependencies */
 const config = require('config');
 const http = require('http');
-const log = require('npmlog');
 
 const app = require('../app');
+const log = require('../src/components/log')(module.filename);
 
 /** Normalize a port into a number, string, or false. */
 const normalizePort = val => {
@@ -37,11 +37,11 @@ const onError = error => {
   // handle specific listen errors with friendly messages
   switch (error.code) {
     case 'EACCES':
-      log.error(bind + ' requires elevated privileges');
+      log.error(bind + ' requires elevated privileges', { function: 'onError' });
       process.exit(1);
       break;
     case 'EADDRINUSE':
-      log.error(bind + ' is already in use');
+      log.error(bind + ' is already in use', { function: 'onError' });
       process.exit(1);
       break;
     default:
