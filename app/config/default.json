@@ -3,7 +3,7 @@
     "apiPath": "api/v1",
     "basePath" : "/app",
     "keycloak": {
-      "serverUrl": "https://dev.oidc.gov.bc.ca/auth"
+      "serverUrl": "https://dev.loginproxy.gov.bc.ca/auth"
     }
   },
   "server": {
@@ -11,7 +11,7 @@
     "basePath" : "/app",
     "bodyLimit": "30mb",
     "keycloak": {
-      "serverUrl": "https://dev.oidc.gov.bc.ca/auth"
+      "serverUrl": "https://dev.loginproxy.gov.bc.ca/auth"
     },
     "logLevel": "http",
     "port": "8080"
