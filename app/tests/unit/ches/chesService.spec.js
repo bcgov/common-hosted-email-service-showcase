@@ -5,7 +5,7 @@ const MockAdapter = require('axios-mock-adapter');
 const chesService = require('../../../src/ches/chesService');
 const errorToProblem = require('../../../src/components/errorToProblem');
 
-const apiUrl = `${config.get('serviceClient.commonServices.ches.endpoint')}/v1`;
+const apiUrl = `${config.get('serviceClient.ches.endpoint')}/v1`;
 const mockInstance = axios.create();
 const mockAxios = new MockAdapter(mockInstance);
 

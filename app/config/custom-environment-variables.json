@@ -25,16 +25,11 @@
     "port": "SERVER_PORT"
   },
   "serviceClient": {
-    "commonServices": {
-      "ches": {
-        "endpoint": "SC_CS_CHES_ENDPOINT"
-      },
-      "cdogs": {
-        "endpoint": "SC_CS_CDOGS_ENDPOINT"
-      },
-      "tokenEndpoint": "SC_CS_TOKEN_ENDPOINT",
-      "username": "SC_CS_USERNAME",
-      "password": "SC_CS_PASSWORD"
+    "ches": {
+      "endpoint": "SC_CHES_ENDPOINT",
+      "username": "SC_CHES_USERNAME",
+      "password": "SC_CHES_PASSWORD",
+      "tokenEndpoint": "SC_CS_TOKEN_ENDPOINT"
     }
   }
 }

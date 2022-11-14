@@ -1,6 +1,5 @@
 const axios = require('axios');
 const log = require('../../src/components/log')(module.filename);
-const oauth = require('axios-oauth-client');
 const tokenProvider = require('axios-token-interceptor');
 
 class ClientConnection {
@@ -11,20 +10,28 @@ class ClientConnection {
       throw new Error('ClientConnection is not configured. Check configuration.');
     }
 
-    this.tokenUrl = tokenUrl;
-
+    // intercept axios calls with access token
     this.axios = axios.create();
     this.axios.interceptors.request.use(
-      // Wraps axios-token-interceptor with oauth-specific configuration,
-      // fetches the token using the desired claim method, and caches
-      // until the token expires
-      oauth.interceptor(tokenProvider, oauth.client(axios.create(), {
-        url: this.tokenUrl,
-        grant_type: 'client_credentials',
-        client_id: clientId,
-        client_secret: clientSecret,
-        scope: ''
-      }))
+      tokenProvider({
+        getToken: () =>
+          axios({
+            method: 'POST',
+            url: tokenUrl,
+            data: {
+              client_id: clientId,
+              client_secret: clientSecret,
+              grant_type: 'client_credentials',
+            },
+            headers: {
+              'Content-type': 'application/x-www-form-urlencoded',
+            },
+            withCredentials: true,
+          }).then((response) => {
+            // Return token here
+            return response.data.access_token;
+          }),
+      })
     );
   }
 }

@@ -62,10 +62,10 @@ def runStageDeploy(String stageEnv, String projectEnv, String hostEnv, String pa
 
       echo "Checking for ConfigMaps and Secrets in project ${openshift.project()}..."
       if(!(openshift.selector('cm', "${APP_NAME}-frontend-config").exists() &&
-      openshift.selector('cm', "${APP_NAME}-sc-config").exists() &&
+      openshift.selector('cm', "${APP_NAME}-sc-ches-config").exists() &&
       openshift.selector('cm', "${APP_NAME}-server-config").exists() &&
       openshift.selector('secret', "${APP_NAME}-keycloak-secret").exists() &&
-      openshift.selector('secret', "${APP_NAME}-sc-cs-secret").exists())) {
+      openshift.selector('secret', "${APP_NAME}-sc-ches-secret").exists())) {
         echo 'Some ConfigMaps and/or Secrets are missing. Please consult the openshift readme for details.'
         throw new Exception('Missing ConfigMaps and/or Secrets')
       }

@@ -82,21 +82,21 @@ objects:
                     secretKeyRef:
                       key: password
                       name: "${APP_NAME}-keycloak-secret"
-                - name: SC_CS_USERNAME
+                - name: SC_CHES_USERNAME
                   valueFrom:
                     secretKeyRef:
                       key: username
-                      name: "${APP_NAME}-sc-cs-secret"
-                - name: SC_CS_PASSWORD
+                      name: "${APP_NAME}-sc-ches-secret"
+                - name: SC_CHES_PASSWORD
                   valueFrom:
                     secretKeyRef:
                       key: password
-                      name: "${APP_NAME}-sc-cs-secret"
+                      name: "${APP_NAME}-sc-ches-secret"
               envFrom:
                 - configMapRef:
                     name: "${APP_NAME}-frontend-config"
                 - configMapRef:
-                    name: "${APP_NAME}-sc-config"
+                    name: "${APP_NAME}-sc-ches-config"
                 - configMapRef:
                     name: "${APP_NAME}-server-config"
           restartPolicy: Always
