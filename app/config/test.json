@@ -14,9 +14,11 @@
     "logLevel": "silent"
   },
   "serviceClient": {
-    "commonServices": {
+    "ches": {
+      "endpoint": "endpoint",
       "username": "username",
-      "password": "password"
+      "password": "password",
+      "tokenEndpoint": "tokenEndpoint"
     }
   }
 }

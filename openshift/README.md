@@ -38,10 +38,9 @@ oc create -n $NAMESPACE configmap $APP_NAME-frontend-config \
 ```
 
 ```sh
-oc create -n $NAMESPACE configmap $APP_NAME-sc-config \
-  --from-literal=SC_CS_CHES_ENDPOINT=https://ches-dev.apps.silver.devops.gov.bc.ca/api \
-  --from-literal=SC_CS_CDOGS_ENDPOINT=https://cdogs-dev.apps.silver.devops.gov.bc.ca/api \
-  --from-literal=SC_CS_TOKEN_ENDPOINT=https://dev.oidc.gov.bc.ca/auth/realms/jbd6rnxw/protocol/openid-connect/token
+oc create -n $NAMESPACE configmap $APP_NAME-sc-ches-config \
+  --from-literal=SC_CHES_ENDPOINT=https://ches-dev.api.gov.bc.ca/api \
+  --from-literal=SC_CS_TOKEN_ENDPOINT=https://dev.loginproxy.gov.bc.ca/auth/realms/comsvcauth/protocol/openid-connect/token
 ```
 
 ```sh
@@ -50,8 +49,8 @@ oc create -n $NAMESPACE configmap $APP_NAME-server-config \
   --from-literal=SERVER_BASEPATH=/app \
   --from-literal=SERVER_BODYLIMIT=30mb \
   --from-literal=SERVER_KC_PUBLICKEY=$PUBLIC_KEY \
-  --from-literal=SERVER_KC_REALM=98r0z7rz \
-  --from-literal=SERVER_KC_SERVERURL=https://dev.oidc.gov.bc.ca/auth \
+  --from-literal=SERVER_KC_REALM=standard \
+  --from-literal=SERVER_KC_SERVERURL=https://dev.loginproxy.gov.bc.ca/auth \
   --from-literal=SERVER_LOGLEVEL=info \
   --from-literal=SERVER_MORGANFORMAT=combined \
   --from-literal=SERVER_PORT=8080
@@ -72,7 +71,7 @@ oc create -n $NAMESPACE secret generic $APP_NAME-keycloak-secret \
 ```
 
 ```sh
-oc create -n $NAMESPACE secret generic $APP_NAME-sc-cs-secret \
+oc create -n $NAMESPACE secret generic $APP_NAME-sc-ches-secret \
   --type=kubernetes.io/basic-auth \
   --from-literal=username=<username> \
   --from-literal=password=<password>
