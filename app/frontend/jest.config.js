@@ -4,7 +4,8 @@ module.exports = {
   collectCoverageFrom: ['src/**/*.{js,vue}', '!src/main.js', '!src/plugins/*.*'],
   moduleFileExtensions: ['js', 'json', 'vue', 'jsx'],
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1'
+    '^@/(.*)$': '<rootDir>/src/$1',
+    '^axios$': require.resolve('axios') // import axios as module (ref: https://github.com/axios/axios/issues/5101)
   },
   preset: '@vue/cli-plugin-unit-jest',
   setupFiles: ['<rootDir>/tests/unit/globalSetup.js'],
