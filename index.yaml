@@ -1,0 +1,30 @@
+apiVersion: v1
+entries:
+  common-hosted-email-service-showcase:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2023-06-19T23:37:27.559596405Z"
+    description: A Showcase application to demonstrate features of the Common Document
+      Generation Service
+    digest: 705ddd1015e6630340768f9f7ae73005bed357cd50d3e92db884c7928515cb65
+    home: https://bcgov.github.io/common-hosted-email-service-showcase
+    keywords:
+    - nodejs
+    - javascript
+    - docker
+    - microservice
+    - email
+    - vue
+    kubeVersion: '>= 1.13.0'
+    maintainers:
+    - email: NR.CommonServiceShowcase@gov.bc.ca
+      name: NR Common Service Showcase Team
+      url: https://bcgov.github.io/common-service-showcase/team.html
+    name: common-hosted-email-service-showcase
+    sources:
+    - https://github.com/bcgov/common-hosted-email-service-showcase
+    type: application
+    urls:
+    - https://github.com/bcgov/common-hosted-email-service-showcase/releases/download/common-hosted-email-service-showcase-0.0.1/common-hosted-email-service-showcase-0.0.1.tgz
+    version: 0.0.1
+generated: "2023-06-19T23:37:27.559602405Z"
