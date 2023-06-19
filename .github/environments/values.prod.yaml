@@ -1,0 +1,16 @@
+---
+config:
+  enabled: true
+  configMap:
+    FRONTEND_KC_CLIENTID: ches-showcase-frontend-4105
+    FRONTEND_KC_REALM: standard
+    FRONTEND_KC_SERVERURL: https://loginproxy.gov.bc.ca/auth
+    # FRONTEND_DASHBOARDURL: https://ches-metabase.apps.silver.devops.gov.bc.ca/public/dashboard/6f388f95-dba7-4632-be4c-8855ee645f31
+    SERVER_KC_PUBLICKEY: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmHiuPKOkpkq4GXN1ktr23rJtDl6Vdu/Y37ZAd3PnQ8/IDfAODvy1Y81aAUZicKe9egolv+OTRANN3yOg+TAbRhkeXLE5p/473EK0aQ0NazTCuWo6Am3oDQ7Yt8x0pw56/qcLtkTuXNyo5EnVV2Z2BzCnnaL31JOhyitolku0DNT6GDoRBmT4o2ItqEVHk5nM25cf1t2zbwI2790W6if1B2qVRkxxivS8tbH7nYC61Is3XCPockKptkH22cm2ZQJmtYd5sZKuXaGsvtyzHmn8/l0Kd1xnHmUu4JNuQ67YiNZGu3hOkrF0Js3BzAk1Qm4kvYRaxbJFCs/qokLZ4Z0W9wIDAQAB
+    SERVER_KC_REALM: standard
+    SERVER_KC_SERVERURL: https://loginproxy.gov.bc.ca/auth
+    # SERVER_LOGFILE: ./app.log
+    SERVER_LOGLEVEL: http
+    SERVER_PORT: "8080"
+    SC_CHES_ENDPOINT: https://ches.api.gov.bc.ca/api
+    SC_CS_TOKEN_ENDPOINT: https://loginproxy.gov.bc.ca/auth/realms/comsvcauth/protocol/openid-connect/token
