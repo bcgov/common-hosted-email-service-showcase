@@ -9,27 +9,24 @@ A showcase application for the Common Hosted Email Service (CHES).
 
 ## Directory Structure
 
-    .github/                   - PR and Issue templates
+    .github/                   - PR and Issue templates, GH Actions configuration
     app/                       - Application Root
     ├── frontend/              - Frontend Root
     │   ├── src/               - Vue.js frontend web application
     │   └── tests/             - Vue.js frontend web application tests
     ├── src/                   - Node.js backend web application
     └── tests/                 - Node.js backend web application tests
-    openshift/                 - OpenShift-deployment and shared pipeline files
+    charts/                    - Helm charts for CI/CD pipeline
     CODE-OF-CONDUCT.md         - Code of Conduct
     COMPLIANCE.yaml            - BCGov PIA/STRA compliance status
     CONTRIBUTING.md            - Contributing Guidelines
-    Jenkinsfile                - Top-level Pipeline
-    Jenkinsfile.cicd           - Pull-Request Pipeline
+    Dockerfile                 - for building app in deployments
     LICENSE                    - License
 
 ## Documentation
 
 * [Application Readme](app/README.md)
 * [Frontend Readme](app/frontend/README.md)
-* [Openshift Readme](openshift/README.md)
-* [Devops Tools Setup](https://github.com/bcgov/nr-showcase-devops-tools)
 
 ## Quick Start Dev Guide
 
