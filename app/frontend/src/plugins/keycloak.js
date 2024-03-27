@@ -67,7 +67,7 @@ export default {
 
 function init(config, watch, options) {
   const ctor = sanitizeConfig(config);
-  const keycloak = Keycloak(ctor);
+  const keycloak = new Keycloak(ctor);
 
   watch.$once('ready', function (cb) {
     cb && cb();
