@@ -7,7 +7,7 @@ fs.readFile(file, 'utf8', (err, data) => {
   if (err) {
     return console.error(err); // eslint-disable-line no-console
   }
-  const result = data.replace(/src/g, `${process.cwd()}/src`);
+  const result = data.replace(/SF:/g, `SF:${process.cwd()}/`);
 
   fs.writeFile(file, result, 'utf8', err => {
     if (err) return console.error(err); // eslint-disable-line no-console

@@ -5,7 +5,11 @@ module.exports = {
     jest: true,
     node: true
   },
-  extends: ['plugin:vue/essential', 'eslint:recommended'],
+  extends: [
+    'plugin:vue/essential',
+    'plugin:vuetify/base',
+    'eslint:recommended'
+  ],
   plugins: ['vuetify'],
   globals: {
     Atomics: 'readonly',
@@ -13,8 +17,9 @@ module.exports = {
     _: false
   },
   parserOptions: {
-    parser: 'babel-eslint',
-    ecmaVersion: 8
+    parser: '@babel/eslint-parser',
+    ecmaVersion: 8,
+    requireConfigFile: false
   },
   rules: {
     'eol-last': ['error', 'always'],

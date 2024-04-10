@@ -67,7 +67,7 @@
  * The contexts are also displayed to the user in a table
  */
 
-import XLSX from 'xlsx';
+import * as XLSX from 'xlsx';
 import { format, parse, isValid } from 'date-fns';
 
 import { mapActions } from 'vuex';
