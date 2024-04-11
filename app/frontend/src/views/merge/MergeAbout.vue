@@ -37,9 +37,8 @@
             <li>On the merge screen, drag/upload the data file into the contexts field.</li>
             <li>Review the contents of the table.</li>
             <li>Click the JSON radio button to review the contents - this the context list sent to CHES.</li>
-            <li>For the body, use the html format editor.<br />
-              Click the 'Source' button in the editor's toolbar to insert the html from the example template</li>
-            <li>For the Subject, enter &quot;ATTN&#58; &#123;&#123;scope&#125;&#125;&#33;&quot;</li>
+            <li>For the body of the emails, insert the html from the example template, or use plain text.<br />The contexts can be inserted into the email body using the curly braces syntax. for example: <span v-pre>'Dear: {{ firstName }} {{ lastName }}'</span></li>
+            <li>For the Subject, you can enter <span v-pre>'ATTN: {{ scope }}'</span></li>
             <li>Click Preview</li>
           </ol>
 
