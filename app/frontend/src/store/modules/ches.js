@@ -19,7 +19,7 @@ export default {
     mergeForm: {
       attachments: [],
       bodyHtml: '',
-      bodyText: '',
+      body: '',
       bodyType: 'html',
       priority: 'normal',
       recipients: [],

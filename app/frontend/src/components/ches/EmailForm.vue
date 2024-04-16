@@ -184,7 +184,6 @@
         <!-- body -->
         <v-col cols="12" md="12" class="bodyDiv">
           <v-textarea
-            v-if="form.bodyFormat === 'text'"
             v-model="form.body"
             :rules="bodyRequiredRule"
             hide-details="auto"
@@ -193,14 +192,6 @@
             value="Enter your email body here."
             class="mb-3"
           ></v-textarea>
-          <div v-else :class="bodyHtmlErrors.length > 0 ? 'errorBorder' : ''">
-            <Ckeditor
-              v-model="form.body"
-              :value.sync="form.body"
-            />
-          </div>
-          <VMessages v-if="form.bodyFormat === 'html'" :value="bodyHtmlErrors" color="error" class="ma-2" />
-
         </v-col>
       </v-row>
 
@@ -242,14 +233,12 @@ import { Regex } from '../../utils/constants';
 
 import DatetimePicker from '@/components/vuetify/DatetimePicker';
 import Upload from '@/components/ches/Upload';
-import Ckeditor from '@/components/ches/Ckeditor';
 
 export default {
   name: 'EmailForm',
   components: {
     Upload,
     'v-datetime-picker': DatetimePicker,
-    Ckeditor,
   },
   data: () => ({
     // form data fields
@@ -286,7 +275,6 @@ export default {
         'Please enter all valid email addresses',
     ],
     bodyRequiredRule: [(v) => !!v || 'Email Body is required'],
-    bodyHtmlErrors: [],
   }),
 
   computed: {
@@ -298,13 +286,6 @@ export default {
     computedBody() {
       return this.form.body;
     }
-  },
-
-  watch: {
-    // show validation message if bodyHtml is empty
-    computedBody: function () {
-      this.validateHtmlBody();
-    },
   },
 
   methods: {
@@ -384,23 +365,11 @@ export default {
       window.scrollTo(0, 0);
     },
 
-    // add vuetify-like error to html body editor
-    validateHtmlBody() {
-      if (this.form.bodyFormat === 'html' && this.form.body === '') {
-        this.bodyHtmlErrors = ['Email Body is required'];
-        return false;
-      } else {
-        this.bodyHtmlErrors = [];
-        return true;
-      }
-    },
 
     validateForm() {
       if (
         // if vuetify rules pass
-        this.$refs.form.validate() &&
-        // and body is valid
-        this.validateHtmlBody()
+        this.$refs.form.validate()
       ) {
         return true;
       }

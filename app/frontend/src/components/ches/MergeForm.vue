@@ -139,24 +139,13 @@
 
               <!-- text -->
               <v-textarea
-                v-if="bodyType === 'text'"
-                v-model="bodyText"
-                :rules="bodyTextRequiredRule"
+                v-model="body"
+                :rules="[(v) => !!v || 'Body is required']"
                 outlined
                 dense
                 rows="8"
                 class="mb-3"
               />
-              <!-- html -->
-              <div v-else class="bodyDiv">
-                <div :class="bodyHtmlErrors.length > 0 ? 'errorBorder' : ''">
-                  <Ckeditor
-                    v-model="bodyHtml"
-                    :value.sync="bodyHtml"
-                  />
-                </div>
-                <VMessages :value="bodyHtmlErrors" color="error" class="ma-2" />
-              </div>
             </v-tab-item>
 
             <v-tab-item>
@@ -229,7 +218,6 @@ import * as Utils from '@/utils/utils';
 
 import Upload from '@/components/ches/Upload';
 import UploadContexts from '@/components/ches/UploadContexts';
-import Ckeditor from '@/components/ches/Ckeditor';
 import MergePreviewDialog from '@/components/ches/MergePreviewDialog';
 
 export default {
@@ -237,7 +225,6 @@ export default {
   components: {
     Upload,
     UploadContexts,
-    Ckeditor,
     MergePreviewDialog,
   },
 
@@ -254,19 +241,16 @@ export default {
     // validation
     jsonContextDataRules: [
       (v) => !!v || 'A JSON array containing Contexts data is required',
-      (v) => Utils.validJson(v) || 'Must be a valid JSON array.',
-      (v) => Utils.validateContexts(v) || 'The Contexts for the mail merge are not defined correctly'
+      (v) => Boolean(Utils.validJson(v)) || 'Must be a valid JSON array.',
+      (v) => Boolean(Utils.validateContexts(v)) || 'The Contexts for the mail merge are not defined correctly'
     ],
-    bodyTextRequiredRule: [(v) => !!v || 'Email Body is required'],
-    bodyHtmlErrors: [],
   }),
 
   computed: {
     // get form data from vuex
     ...mapFields('ches', [
       'mergeForm.attachments',
-      'mergeForm.bodyHtml',
-      'mergeForm.bodyText',
+      'mergeForm.body',
       'mergeForm.bodyType',
       'mergeForm.priority',
       'mergeForm.recipients',
@@ -288,13 +272,6 @@ export default {
     },
   },
 
-  watch: {
-    // show validation message if bodyHtml is empty
-    bodyHtml: function () {
-      this.validateHtmlBody();
-    },
-  },
-
   methods: {
     // ches actions in vuex
     ...mapActions('ches', ['addTransaction']),
@@ -311,7 +288,7 @@ export default {
           const formData = {
             attachments: this.attachments,
             bodyType: this.bodyType,
-            body: this.bodyType == 'text' ? this.bodyText : this.bodyHtml,
+            body: this.body,
             from: this.currentUserEmail,
             subject: this.subject,
             priority: this.priority,
@@ -348,7 +325,7 @@ export default {
           const email = {
             attachments: this.attachments,
             bodyType: this.bodyType,
-            body: this.bodyType === 'html' ? this.bodyHtml : this.bodyText,
+            body: this.body,
             contexts: Utils.getContextsObject(this.contexts),
             from: this.currentUserEmail,
             priority: this.priority,
@@ -408,15 +385,13 @@ export default {
     // reset form
     reloadForm() {
       this.$refs.form.resetValidation();
-      this.bodyHtmlErrors = [];
 
       // reset store:
       this.mergeForm = {
         ...this.mergeForm,
         ...{
           attachments: [],
-          bodyHtml: '',
-          bodyText: '',
+          body: '',
           bodyType: 'html',
           priority: 'normal',
           recipients: [],
@@ -444,25 +419,12 @@ export default {
       window.scrollBy(0, -80);
     },
 
-    // add vuetify-like error to html body editor
-    validateHtmlBody() {
-      if (this.bodyType === 'html' && this.bodyHtml === '') {
-        this.bodyHtmlErrors = ['Email Body is required'];
-        return false;
-      } else {
-        this.bodyHtmlErrors = [];
-        return true;
-      }
-    },
-
     validateForm() {
       // make JSON contexts element visible to show error if empty
       if (this.contexts === '') this.contextsType = 'json';
       if (
         // if vuetify rules pass
         this.$refs.form.validate() &&
-        // and body is valid
-        this.validateHtmlBody() &&
         // check contexts JSON string contains required properties
         Utils.validateContexts(this.contexts)
       ) {
