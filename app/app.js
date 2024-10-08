@@ -6,7 +6,6 @@ const path = require('path');
 const Problem = require('api-problem');
 const querystring = require('querystring');
 
-const keycloak = require('./src/components/keycloak');
 const log = require('./src/components/log')(module.filename);
 const httpLogger = require('./src/components/log').httpLogger;
 const v1Router = require('./src/routes/v1');
@@ -38,9 +37,6 @@ app.use(
 if (process.env.NODE_ENV !== 'test') {
   app.use(httpLogger);
 }
-
-// Use Keycloak OIDC Middleware
-app.use(keycloak.middleware());
 
 // Block requests until service is ready
 app.use((_req, res, next) => {

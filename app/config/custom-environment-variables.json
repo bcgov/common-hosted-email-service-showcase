@@ -5,6 +5,7 @@
     "dashboardUrl": "FRONTEND_DASHBOARDURL",
     "keycloak": {
       "clientId": "FRONTEND_KC_CLIENTID",
+      "publicKey": "FRONTEND_KC_PUBLICKEY",
       "realm": "FRONTEND_KC_REALM",
       "serverUrl": "FRONTEND_KC_SERVERURL"
     }
