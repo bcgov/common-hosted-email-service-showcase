@@ -23,7 +23,7 @@
     "axios": "^1.6.7",
     "core-js": "^3.36.0",
     "date-fns": "^2.29.3",
-    "keycloak-js": "^20.0.1",
+    "keycloak-js": "^25.0.6",
     "lodash": "^4.17.21",
     "nprogress": "^0.2.0",
     "vue": "2.7.16",
